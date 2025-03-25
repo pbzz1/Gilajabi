@@ -36,7 +36,7 @@ class MyHomePage extends StatelessWidget {
         ],
       ),
       body: const Center(
-        child: Text('3월 25일 윈도우 환경 카카오 로그인 테스트 완료'),
+        child: Text('3월 25일 윈도우/맥 환경 카카오 로그인 테스트 완료'),
       ),
     );
   }
