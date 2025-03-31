@@ -1,9 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'login.dart';
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  String? nickname;
+  String? profileImageUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  // 🔹 사용자 정보 불러오기
+  Future<void> _loadUserInfo() async {
+    try {
+      final user = await UserApi.instance.me();
+      setState(() {
+        nickname = user.kakaoAccount?.profile?.nickname ?? '사용자';
+        profileImageUrl = user.kakaoAccount?.profile?.profileImageUrl;
+      });
+    } catch (e) {
+      print('사용자 정보 불러오기 실패: $e');
+    }
+  }
 
   // 🔹 로그아웃 함수
   Future<void> logout(BuildContext context) async {
@@ -11,7 +38,6 @@ class MyHomePage extends StatelessWidget {
       await UserApi.instance.logout(); // 카카오 로그아웃
       print('로그아웃 성공');
 
-      // 🔹 로그인 화면으로 이동 (현재 화면 제거)
       if (context.mounted) {
         Navigator.pushReplacement(
           context,
@@ -30,13 +56,27 @@ class MyHomePage extends StatelessWidget {
         title: const Text('모바일 캡스톤디자인'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout), // 로그아웃 아이콘
-            onPressed: () => logout(context), // 로그아웃 실행
+            icon: const Icon(Icons.logout),
+            onPressed: () => logout(context),
           ),
         ],
       ),
-      body: const Center(
-        child: Text('3월 25일 윈도우/맥 환경 카카오 로그인 테스트 완료'),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (profileImageUrl != null)
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: NetworkImage(profileImageUrl!),
+              ),
+            const SizedBox(height: 16),
+            Text(
+              nickname ?? '닉네임 불러오는 중...',
+              style: const TextStyle(fontSize: 20),
+            ),
+          ],
+        ),
       ),
     );
   }
