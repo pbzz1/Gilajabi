@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'dart:io'; // Android WebView 초기화용
+import 'dart:io';
 
 class NearbyFacilitiesPage extends StatefulWidget {
   const NearbyFacilitiesPage({super.key});
@@ -15,12 +15,16 @@ class _NearbyFacilitiesPageState extends State<NearbyFacilitiesPage> {
   @override
   void initState() {
     super.initState();
+
+    // ✅ Android platform 설정 (중요)
     if (Platform.isAndroid) {
       WebView.platform = SurfaceAndroidWebView();
     }
+
+    // ✅ WebViewController 구성
     _controller = WebViewController()
-      ..loadFlutterAsset('assets/html/kakao_map.html')
-      ..setJavaScriptMode(JavaScriptMode.unrestricted);
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadFlutterAsset('assets/html/kakao_map.html');
   }
 
   @override
