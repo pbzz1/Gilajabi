@@ -14,9 +14,10 @@ class _NearbyFacilitiesPageState extends State<NearbyFacilitiesPage> {
   @override
   void initState() {
     super.initState();
+
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadFlutterAsset('assets/html/kakao_map.html');
+      ..loadRequest(Uri.parse('https://mjchoi1223.github.io/kakao-map-test/kakao_map.html'));
   }
 
   @override

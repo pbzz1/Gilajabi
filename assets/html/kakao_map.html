@@ -11,23 +11,25 @@
           padding: 0;
         }
     </style>
-
-    <!-- ✅ SDK를 async로 로드하고, callback 함수 지정 -->
-    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=d7e9c8ac8fea694b6444dc92bfdf6a1f&autoload=false"></script>
-    <script>
-        window.onload = function () {
-          kakao.maps.load(function () {
-            var mapContainer = document.getElementById('map');
-            var mapOption = {
-              center: new kakao.maps.LatLng(37.5665, 126.9780),
-              level: 3
-            };
-            var map = new kakao.maps.Map(mapContainer, mapOption);
-          });
-        };
-    </script>
 </head>
 <body>
 <div id="map"></div>
+
+<!-- ✅ Kakao SDK 동적 로딩 -->
+<script>
+    const script = document.createElement('script');
+    script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d7e9c8ac8fea694b6444dc92bfdf6a1f&autoload=false";
+    script.onload = function () {      kakao.maps.load(function () {
+        const container = document.getElementById('map');
+        const options = {
+          center: new kakao.maps.LatLng(37.5665, 126.9780),
+          level: 3
+        };
+        const map = new kakao.maps.Map(container, options);
+      });
+    };
+
+    document.head.appendChild(script);
+</script>
 </body>
 </html>
