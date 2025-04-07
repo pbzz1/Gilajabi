@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'login.dart';
+import 'screens/home_tab.dart';
+import 'screens/post_tab.dart';
+import 'screens/profile_tab.dart';
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
-  // 🔹 로그아웃 함수
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _selectedIndex = 0;
+
   Future<void> logout(BuildContext context) async {
     try {
-      await UserApi.instance.logout(); // 카카오 로그아웃
+      await UserApi.instance.logout();
       print('로그아웃 성공');
 
-      // 🔹 로그인 화면으로 이동 (현재 화면 제거)
       if (context.mounted) {
         Navigator.pushReplacement(
           context,
@@ -23,6 +31,18 @@ class MyHomePage extends StatelessWidget {
     }
   }
 
+  final List<Widget> _screens = [
+    const HomeTab(),
+    const PostTab(),
+    const ProfileTab(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,13 +50,30 @@ class MyHomePage extends StatelessWidget {
         title: const Text('모바일 캡스톤디자인'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout), // 로그아웃 아이콘
-            onPressed: () => logout(context), // 로그아웃 실행
+            icon: const Icon(Icons.logout),
+            onPressed: () => logout(context),
           ),
         ],
       ),
-      body: const Center(
-        child: Text('홈 화면'),
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blueAccent,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: '홈',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.post_add),
+            label: '게시물',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: '프로필',
+          ),
+        ],
       ),
     );
   }
