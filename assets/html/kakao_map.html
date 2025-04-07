@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Kakao Map</title>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d7e9c8ac8fea694b6444dc92bfdf6a1f"></script>
     <style>
         html, body, #map {
           width: 100%;
@@ -12,16 +11,23 @@
           padding: 0;
         }
     </style>
+
+    <!-- ✅ SDK를 async로 로드하고, callback 함수 지정 -->
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=d7e9c8ac8fea694b6444dc92bfdf6a1f&autoload=false"></script>
+    <script>
+        window.onload = function () {
+          kakao.maps.load(function () {
+            var mapContainer = document.getElementById('map');
+            var mapOption = {
+              center: new kakao.maps.LatLng(37.5665, 126.9780),
+              level: 3
+            };
+            var map = new kakao.maps.Map(mapContainer, mapOption);
+          });
+        };
+    </script>
 </head>
 <body>
 <div id="map"></div>
-<script>
-    var mapContainer = document.getElementById('map');
-    var mapOption = {
-      center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 중심좌표 (예시)
-      level: 3
-    };
-    var map = new kakao.maps.Map(mapContainer, mapOption);
-</script>
 </body>
 </html>
