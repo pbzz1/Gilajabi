@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Kakao Map</title>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d7e9c8ac8fea694b6444dc92bfdf6a1f"></script>
+    <style>
+        html, body, #map {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    var mapContainer = document.getElementById('map');
+    var mapOption = {
+      center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 중심좌표 (예시)
+      level: 3
+    };
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+</script>
+</body>
+</html>
