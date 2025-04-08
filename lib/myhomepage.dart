@@ -5,6 +5,7 @@ import 'screens/home_tab.dart';
 import 'screens/post_tab.dart';
 import 'screens/profile_tab.dart';
 
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
@@ -13,23 +14,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   int _selectedIndex = 0;
-
-  Future<void> logout(BuildContext context) async {
-    try {
-      await UserApi.instance.logout();
-      print('로그아웃 성공');
-
-      if (context.mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginPage()),
-        );
-      }
-    } catch (error) {
-      print('로그아웃 실패: $error');
-    }
-  }
 
   final List<Widget> _screens = [
     const HomeTab(),
@@ -75,6 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
+
     );
   }
 }
