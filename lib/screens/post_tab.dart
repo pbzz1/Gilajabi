@@ -17,7 +17,7 @@ class _PostTab extends State<PostTab> {
 
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.parse('https://mjchoi1223.github.io/kakao-map-test/kakao_map.html'));
+      ..loadRequest(Uri.parse('https://pbzz1.github.io/Gilajabi/kakao_map.html'));
   }
 
   @override
