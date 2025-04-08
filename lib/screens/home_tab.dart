@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:flutter/material.dart';
+import '../course/course_page.dart'; // 코스 선택 페이지 import (상대 경로)
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -13,7 +14,6 @@ class _HomeTabState extends State<HomeTab> {
   int _currentPage = 0;
   late Timer _timer;
 
-  // 🔹 배너 이미지 경로 리스트
   final List<String> _bannerImages = [
     'assets/images/banner0.jpg',
     'assets/images/banner1.jpg',
@@ -23,14 +23,8 @@ class _HomeTabState extends State<HomeTab> {
   @override
   void initState() {
     super.initState();
-
-    _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
-      if (_currentPage < _bannerImages.length - 1) {
-        _currentPage++;
-      } else {
-        _currentPage = 0;
-      }
-
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      _currentPage = (_currentPage + 1) % _bannerImages.length;
       _pageController.animateToPage(
         _currentPage,
         duration: const Duration(milliseconds: 300),
@@ -46,7 +40,6 @@ class _HomeTabState extends State<HomeTab> {
     super.dispose();
   }
 
-  // 🔹 메뉴 버튼 위젯 (아이콘 + 라벨)
   Widget buildMenuButton(IconData icon, String label) {
     return Container(
       width: 90,
@@ -55,11 +48,11 @@ class _HomeTabState extends State<HomeTab> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 4,
-            offset: const Offset(2, 2),
+            offset: Offset(2, 2),
           ),
         ],
       ),
@@ -87,7 +80,7 @@ class _HomeTabState extends State<HomeTab> {
                 hintText: '검색어를 입력하세요',
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
                 fillColor: Colors.grey[200],
@@ -95,7 +88,7 @@ class _HomeTabState extends State<HomeTab> {
             ),
           ),
 
-          // 🖼️ 배너 (이미지 슬라이드)
+          // 🖼 배너
           SizedBox(
             height: 200,
             child: PageView.builder(
@@ -106,15 +99,15 @@ class _HomeTabState extends State<HomeTab> {
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         color: Colors.black26,
                         blurRadius: 6,
-                        offset: const Offset(2, 4),
+                        offset: Offset(2, 4),
                       ),
                     ],
                   ),
-                  clipBehavior: Clip.antiAlias, // 둥근 모서리에 맞춰 자르기
+                  clipBehavior: Clip.antiAlias,
                   child: Image.asset(
                     _bannerImages[index],
                     fit: BoxFit.cover,
@@ -127,13 +120,21 @@ class _HomeTabState extends State<HomeTab> {
 
           const SizedBox(height: 20),
 
-          // 🎯 메뉴 버튼 6개 (3x2 배치)
+          // 🎯 메뉴 버튼들 (코스 선택만 onTap 있음)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Wrap(
               alignment: WrapAlignment.center,
               children: [
-                buildMenuButton(Icons.map, '코스 선택'),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const CoursePage()),
+                    );
+                  },
+                  child: buildMenuButton(Icons.map, '코스 선택'),
+                ),
                 buildMenuButton(Icons.post_add, '게시물'),
                 buildMenuButton(Icons.person, '프로필'),
                 buildMenuButton(Icons.settings, '설정'),
