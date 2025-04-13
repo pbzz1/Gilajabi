@@ -55,7 +55,7 @@
               // ✅ Polyline 클릭 시 Flutter로 메시지 전송
               kakao.maps.event.addListener(polyline, 'click', function () {
                 if (window.flutter_inappwebview) {
-                  window.flutter_inappwebview.callHandler('onCourseClick', course.name);
+                  window.flutter_inappwebview.postMessage(course.name);
                 } else if (window.ReactNativeWebView) {
                   window.ReactNativeWebView.postMessage(course.name); // fallback
                 } else {

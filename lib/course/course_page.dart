@@ -28,6 +28,7 @@ class _CoursePageState extends State<CoursePage> {
         'flutter_inappwebview',
         onMessageReceived: (message) {
           final course = message.message;
+          print("📦 받은 메시지: $course");
           switch (course) {
             case 'baegak':
               Navigator.push(context, MaterialPageRoute(builder: (_) => const BaegakInfoPage()));
