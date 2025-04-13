@@ -17,7 +17,7 @@
 
 <script>
     const script = document.createElement('script');
-    script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d7e9c8ac8fea694b6444dc92bfdf6a1f&autoload=false";
+    script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=여기에_본인_자바스크립트_앱키&autoload=false";
     script.onload = function () {
       kakao.maps.load(function () {
         const container = document.getElementById('map');
@@ -27,7 +27,6 @@
         };
         const map = new kakao.maps.Map(container, options);
 
-        // 각 구간 정보 (JSON 경로, 색상, 이름, 번호)
         const courses = [
           { file: 'assets/json/baegak_path.json', color: '#5B3A29', name: '백악구간', number: 1 },
           { file: 'assets/json/naksan_path.json', color: '#007bff', name: '낙산구간', number: 2 },
@@ -37,14 +36,23 @@
           { file: 'assets/json/inwangsan_path.json', color: '#8e44ad', name: '인왕산구간', number: 6 }
         ];
 
-        // 각 구간 로드 + 마커 표시
+        // InfoWindow 이벤트 핸들러 추가 함수
+        function addHoverEvents(marker, infoWindow) {
+          kakao.maps.event.addListener(marker, 'mouseover', function () {
+            infoWindow.open(map, marker);
+          });
+          kakao.maps.event.addListener(marker, 'mouseout', function () {
+            infoWindow.close();
+          });
+        }
+
         courses.forEach(course => {
           fetch(course.file)
             .then(res => res.json())
             .then(data => {
               const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
 
-              // 폴리라인 표시
+              // 폴리라인
               const polyline = new kakao.maps.Polyline({
                 path: path,
                 strokeWeight: 4,
@@ -54,25 +62,29 @@
               });
               polyline.setMap(map);
 
-              // 시작 마커 + 라벨
+              // 시작 마커
               const startMarker = new kakao.maps.Marker({
                 position: path[0],
                 map: map
               });
               const startInfo = new kakao.maps.InfoWindow({
-                content: `<div style="padding:5px; font-weight:bold; color:${course.color};">${course.number}코스 ${course.name} 시작</div>`
+                content: `<div style="padding:5px; font-weight:bold; color:${course.color};">
+                  ${course.number}코스 ${course.name}</div>`,
+                removable: true
               });
-              startInfo.open(map, startMarker);
+              addHoverEvents(startMarker, startInfo);
 
-              // 끝 마커 + 라벨
+              // 끝 마커
               const endMarker = new kakao.maps.Marker({
                 position: path[path.length - 1],
                 map: map
               });
               const endInfo = new kakao.maps.InfoWindow({
-                content: `<div style="padding:5px; font-weight:bold; color:${course.color};">${course.number}코스 ${course.name} 끝</div>`
+                content: `<div style="padding:5px; font-weight:bold; color:${course.color};">
+                  ${course.number}코스 ${course.name}</div>`,
+                removable: true
               });
-              endInfo.open(map, endMarker);
+              addHoverEvents(endMarker, endInfo);
             });
         });
       });
