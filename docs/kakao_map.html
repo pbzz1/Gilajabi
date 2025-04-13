@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>한양도성 전체 코스</title>
+    <title>한양도성 콜아웃 지도</title>
     <style>
         html, body, #map {
           width: 100%;
@@ -28,31 +28,20 @@
         const map = new kakao.maps.Map(container, options);
 
         const courses = [
-          { file: 'assets/json/baegak_path.json', color: '#5B3A29', name: '백악구간', number: 1 },
-          { file: 'assets/json/naksan_path.json', color: '#007bff', name: '낙산구간', number: 2 },
-          { file: 'assets/json/heunginjimun_path.json', color: '#00b894', name: '흥인지문구간', number: 3 },
-          { file: 'assets/json/namsan_path.json', color: '#e74c3c', name: '남산구간', number: 4 },
-          { file: 'assets/json/sungnyemun_path.json', color: '#f39c12', name: '숭례문구간', number: 5 },
-          { file: 'assets/json/inwangsan_path.json', color: '#8e44ad', name: '인왕산구간', number: 6 }
+          { name: "baegak", label: "백악구간", color: "#5B3A29", start: [37.5927435, 126.9665319], labelPos: [37.5930435, 126.9663319] },
+          { name: "naksan", label: "낙산구간", color: "#007bff", start: [37.5878648, 127.0039567], labelPos: [37.5882648, 127.0041567] },
+          { name: "heunginjimun", label: "흥인지문구간", color: "#00b894", start: [37.571258, 127.010516], labelPos: [37.571558, 127.010816] },
+          { name: "namsan", label: "남산구간", color: "#e74c3c", start: [37.5579475, 127.0079613], labelPos: [37.5582475, 127.0076613] },
+          { name: "sungnyemun", label: "숭례문구간", color: "#f39c12", start: [37.5558457, 126.977199], labelPos: [37.5562457, 126.977099] },
+          { name: "inwangsan", label: "인왕산구간", color: "#8e44ad", start: [37.568331, 126.968873], labelPos: [37.568831, 126.968973] }
         ];
 
-        // InfoWindow 이벤트 핸들러 추가 함수
-        function addHoverEvents(marker, infoWindow) {
-          kakao.maps.event.addListener(marker, 'mouseover', function () {
-            infoWindow.open(map, marker);
-          });
-          kakao.maps.event.addListener(marker, 'mouseout', function () {
-            infoWindow.close();
-          });
-        }
-
         courses.forEach(course => {
-          fetch(course.file)
+          fetch(`assets/json/${course.name}_path.json`)
             .then(res => res.json())
             .then(data => {
-              const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
+              const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
 
-              // 폴리라인
               const polyline = new kakao.maps.Polyline({
                 path: path,
                 strokeWeight: 4,
@@ -61,6 +50,38 @@
                 strokeStyle: 'solid'
               });
               polyline.setMap(map);
+
+              // 커스텀 오버레이 (라인 + 라벨)
+              const lineHTML = `
+                <div style="position: relative;">
+                  <div style="
+                    position: absolute;
+                    width: 2px;
+                    height: 20px;
+                    background: ${course.color};
+                    top: 0; left: 50%; transform: translateX(-50%);
+                  "></div>
+                  <div style="
+                    margin-top: 20px;
+                    white-space: nowrap;
+                    padding: 6px 10px;
+                    background: white;
+                    border: 2px solid ${course.color};
+                    color: ${course.color};
+                    font-weight: bold;
+                    border-radius: 8px;
+                    box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+                  ">
+                    ${course.label}
+                  </div>
+                </div>`;
+
+              const overlay = new kakao.maps.CustomOverlay({
+                position: new kakao.maps.LatLng(course.labelPos[0], course.labelPos[1]),
+                content: lineHTML,
+                yAnchor: 0
+              });
+              overlay.setMap(map);
             });
         });
       });
