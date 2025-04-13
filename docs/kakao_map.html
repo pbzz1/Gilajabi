@@ -2,13 +2,13 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>한양도성 낙산구간</title>
+    <title>한양도성 전체 코스</title>
     <style>
         html, body, #map {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          padding: 0;
         }
     </style>
 </head>
@@ -19,108 +19,63 @@
     const script = document.createElement('script');
     script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d7e9c8ac8fea694b6444dc92bfdf6a1f&autoload=false";
     script.onload = function () {
-        kakao.maps.load(function () {
-            const container = document.getElementById('map');
-            const options = {
-                center: new kakao.maps.LatLng(37.5878, 127.0040),
-                level: 5
-            };
-            const map = new kakao.maps.Map(container, options);
+      kakao.maps.load(function () {
+        const container = document.getElementById('map');
+        const options = {
+          center: new kakao.maps.LatLng(37.5878, 127.0040),
+          level: 5
+        };
+        const map = new kakao.maps.Map(container, options);
 
-            // 1코스 백악구간
-            fetch('assets/json/baegak_path.json')
-                .then(res => res.json())
-                .then(data => {
-                    const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
-                    const polyline = new kakao.maps.Polyline({
-                        path: path,
-                        strokeWeight: 4,
-                        strokeColor: '#5B3A29',
-                        strokeOpacity: 0.8,
-                        strokeStyle: 'solid'
-                    });
-                    polyline.setMap(map);
-                });
+        // 각 구간 정보 (JSON 경로, 색상, 이름, 번호)
+        const courses = [
+          { file: 'assets/json/baegak_path.json', color: '#5B3A29', name: '백악구간', number: 1 },
+          { file: 'assets/json/naksan_path.json', color: '#007bff', name: '낙산구간', number: 2 },
+          { file: 'assets/json/heunginjimun_path.json', color: '#00b894', name: '흥인지문구간', number: 3 },
+          { file: 'assets/json/namsan_path.json', color: '#e74c3c', name: '남산구간', number: 4 },
+          { file: 'assets/json/sungnyemun_path.json', color: '#f39c12', name: '숭례문구간', number: 5 },
+          { file: 'assets/json/inwangsan_path.json', color: '#8e44ad', name: '인왕산구간', number: 6 }
+        ];
 
-            // 2코스 낙산구간
-            fetch('assets/json/naksan_path.json')
-                .then(res => res.json())
-                .then(data => {
-                    const infowindow = new kakao.maps.InfoWindow({
-                        content: '<div style="padding:5px;">낙산구간<br>총 2.1km</div>'
-                    });
-                    const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
-                    const polyline = new kakao.maps.Polyline({
-                        path: path,
-                        strokeWeight: 4,
-                        strokeColor: '#007bff',
-                        strokeOpacity: 0.8,
-                        strokeStyle: 'solid'
-                    });
-                    polyline.setMap(map);
-                });
+        // 각 구간 로드 + 마커 표시
+        courses.forEach(course => {
+          fetch(course.file)
+            .then(res => res.json())
+            .then(data => {
+              const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
 
-            // 3코스 흥인지문구간
-            fetch('assets/json/heunginjimun_path.json')
-                .then(res => res.json())
-                .then(data => {
-                    const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
-                    const polyline = new kakao.maps.Polyline({
-                        path: path,
-                        strokeWeight: 4,
-                        strokeColor: '#00b894',
-                        strokeOpacity: 0.8,
-                        strokeStyle: 'solid'
-                    });
-                    polyline.setMap(map);
-                });
+              // 폴리라인 표시
+              const polyline = new kakao.maps.Polyline({
+                path: path,
+                strokeWeight: 4,
+                strokeColor: course.color,
+                strokeOpacity: 0.8,
+                strokeStyle: 'solid'
+              });
+              polyline.setMap(map);
 
-            // 4코스 남산구간
-            fetch('assets/json/namsan_path.json')
-                .then(res => res.json())
-                .then(data => {
-                    const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
-                    const polyline = new kakao.maps.Polyline({
-                        path: path,
-                        strokeWeight: 4,
-                        strokeColor: '#e74c3c',
-                        strokeOpacity: 0.8,
-                        strokeStyle: 'solid'
-                    });
-                    polyline.setMap(map);
-                });
+              // 시작 마커 + 라벨
+              const startMarker = new kakao.maps.Marker({
+                position: path[0],
+                map: map
+              });
+              const startInfo = new kakao.maps.InfoWindow({
+                content: `<div style="padding:5px; font-weight:bold; color:${course.color};">${course.number}코스 ${course.name} 시작</div>`
+              });
+              startInfo.open(map, startMarker);
 
-            // 5코스 숭례문구간
-            fetch('assets/json/sungnyemun_path.json')
-                .then(res => res.json())
-                .then(data => {
-                    const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
-                    const polyline = new kakao.maps.Polyline({
-                        path: path,
-                        strokeWeight: 4,
-                        strokeColor: '#f39c12',
-                        strokeOpacity: 0.8,
-                        strokeStyle: 'solid'
-                    });
-                    polyline.setMap(map);
-                });
-
-            // 6코스 인왕산구간
-            fetch('assets/json/inwangsan_path.json')
-                .then(res => res.json())
-                .then(data => {
-                    const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
-                    const polyline = new kakao.maps.Polyline({
-                        path: path,
-                        strokeWeight: 4,
-                        strokeColor: '#8e44ad',
-                        strokeOpacity: 0.8,
-                        strokeStyle: 'solid'
-                    });
-                    polyline.setMap(map);
-                });
-
+              // 끝 마커 + 라벨
+              const endMarker = new kakao.maps.Marker({
+                position: path[path.length - 1],
+                map: map
+              });
+              const endInfo = new kakao.maps.InfoWindow({
+                content: `<div style="padding:5px; font-weight:bold; color:${course.color};">${course.number}코스 ${course.name} 끝</div>`
+              });
+              endInfo.open(map, endMarker);
+            });
         });
+      });
     };
     document.head.appendChild(script);
 </script>
