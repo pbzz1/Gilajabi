@@ -1,3 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>한양도성 낙산구간</title>
+    <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
 <script>
     const script = document.createElement('script');
     script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d7e9c8ac8fea694b6444dc92bfdf6a1f&autoload=false";
@@ -10,7 +27,22 @@
             };
             const map = new kakao.maps.Map(container, options);
 
-            // 🔵 낙산 구간
+            // 1코스 백악구간
+            fetch('assets/json/baegak_path.json')
+                .then(res => res.json())
+                .then(data => {
+                    const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
+                    const polyline = new kakao.maps.Polyline({
+                        path: path,
+                        strokeWeight: 4,
+                        strokeColor: '#5B3A29',
+                        strokeOpacity: 0.8,
+                        strokeStyle: 'solid'
+                    });
+                    polyline.setMap(map);
+                });
+
+            // 2코스 낙산구간
             fetch('assets/json/naksan_path.json')
                 .then(res => res.json())
                 .then(data => {
@@ -25,15 +57,60 @@
                     polyline.setMap(map);
                 });
 
-            // 🔴 백악 구간
-            fetch('assets/json/baegak_path.json')
+            // 3코스 흥인지문구간
+            fetch('assets/json/heunginjimun_path.json')
                 .then(res => res.json())
                 .then(data => {
                     const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
                     const polyline = new kakao.maps.Polyline({
                         path: path,
                         strokeWeight: 4,
-                        strokeColor: '#ff3b3b',
+                        strokeColor: '#00b894',
+                        strokeOpacity: 0.8,
+                        strokeStyle: 'solid'
+                    });
+                    polyline.setMap(map);
+                });
+
+            // 4코스 남산문구간
+            fetch('assets/json/heunginjimun_path.json')
+                .then(res => res.json())
+                .then(data => {
+                    const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
+                    const polyline = new kakao.maps.Polyline({
+                        path: path,
+                        strokeWeight: 4,
+                        strokeColor: '#e74c3c',
+                        strokeOpacity: 0.8,
+                        strokeStyle: 'solid'
+                    });
+                    polyline.setMap(map);
+                });
+
+            // 5코스 숭례문구간
+            fetch('assets/json/heunginjimun_path.json')
+                .then(res => res.json())
+                .then(data => {
+                    const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
+                    const polyline = new kakao.maps.Polyline({
+                        path: path,
+                        strokeWeight: 4,
+                        strokeColor: '#f39c12',
+                        strokeOpacity: 0.8,
+                        strokeStyle: 'solid'
+                    });
+                    polyline.setMap(map);
+                });
+
+            // 6코스 인왕산구간
+            fetch('assets/json/heunginjimun_path.json')
+                .then(res => res.json())
+                .then(data => {
+                    const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
+                    const polyline = new kakao.maps.Polyline({
+                        path: path,
+                        strokeWeight: 4,
+                        strokeColor: '#8e44ad',
                         strokeOpacity: 0.8,
                         strokeStyle: 'solid'
                     });
@@ -44,3 +121,5 @@
     };
     document.head.appendChild(script);
 </script>
+</body>
+</html>
