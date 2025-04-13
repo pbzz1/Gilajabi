@@ -42,7 +42,6 @@
             .then(data => {
               const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
 
-              // 지도에 선 추가
               const polyline = new kakao.maps.Polyline({
                 path: path,
                 strokeWeight: 4,
@@ -52,39 +51,28 @@
               });
               polyline.setMap(map);
 
-              // 중간 지점에 라벨 위치
               const midIndex = Math.floor(path.length / 2);
               const labelPos = path[midIndex];
 
-              // Callout 스타일 라벨 HTML
-              const lineHTML = `
-                <div style="position: relative;">
-                  <div style="
-                    position: absolute;
-                    width: 2px;
-                    height: 20px;
-                    background: ${course.color};
-                    top: 0; left: 50%; transform: translateX(-50%);
-                  "></div>
-                  <div style="
-                    margin-top: 20px;
-                    white-space: nowrap;
-                    padding: 6px 10px;
-                    background: white;
-                    border: 2px solid ${course.color};
-                    color: ${course.color};
-                    font-weight: bold;
-                    border-radius: 8px;
-                    box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
-                  ">
-                    ${course.label}
-                  </div>
+              // 텍스트만 표시하는 오버레이 (Callout 선 제거)
+              const labelHTML = `
+                <div style="
+                  padding: 6px 10px;
+                  background: white;
+                  border: 2px solid ${course.color};
+                  color: ${course.color};
+                  font-weight: bold;
+                  border-radius: 8px;
+                  box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+                  white-space: nowrap;
+                ">
+                  ${course.label}
                 </div>`;
 
               const overlay = new kakao.maps.CustomOverlay({
                 position: labelPos,
-                content: lineHTML,
-                yAnchor: 0
+                content: labelHTML,
+                yAnchor: 1
               });
               overlay.setMap(map);
             });
