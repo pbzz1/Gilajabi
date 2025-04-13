@@ -29,7 +29,7 @@
             const map = new kakao.maps.Map(container, options);
 
             // ✅ JSON 파일 GitHub Pages에서 로드
-            fetch('docs/assets/json/naksan_path.json')
+            fetch('https://github.com/pbzz1/Gilajabi/blob/main/docs/assets/json/naksan_path.json')
                 .then(res => res.json())
                 .then(data => {
                     const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
