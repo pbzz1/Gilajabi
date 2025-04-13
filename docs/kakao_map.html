@@ -46,6 +46,9 @@
             fetch('assets/json/naksan_path.json')
                 .then(res => res.json())
                 .then(data => {
+                    const infowindow = new kakao.maps.InfoWindow({
+                        content: '<div style="padding:5px;">낙산구간<br>총 2.1km</div>'
+                    });
                     const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
                     const polyline = new kakao.maps.Polyline({
                         path: path,
