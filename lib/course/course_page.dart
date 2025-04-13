@@ -25,7 +25,7 @@ class _CoursePageState extends State<CoursePage> {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..addJavaScriptChannel(
-        'flutter_inappwebview',
+        'CourseChannel',
         onMessageReceived: (message) {
           final course = message.message;
           print("📦 받은 메시지: $course");
