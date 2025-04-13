@@ -1,20 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <title>한양도성 낙산구간</title>
-    <style>
-        html, body, #map {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
-</head>
-<body>
-<div id="map"></div>
-
 <script>
     const script = document.createElement('script');
     script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d7e9c8ac8fea694b6444dc92bfdf6a1f&autoload=false";
@@ -27,7 +10,7 @@
             };
             const map = new kakao.maps.Map(container, options);
 
-            // ✅ ✅ 경로에서 /docs 생략하고 JSON 불러오기
+            // 🔵 낙산 구간
             fetch('assets/json/naksan_path.json')
                 .then(res => res.json())
                 .then(data => {
@@ -40,13 +23,24 @@
                         strokeStyle: 'solid'
                     });
                     polyline.setMap(map);
-                })
-                .catch(err => {
-                    console.error("경로 불러오기 실패:", err);
                 });
+
+            // 🔴 백악 구간
+            fetch('assets/json/baegak_path.json')
+                .then(res => res.json())
+                .then(data => {
+                    const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
+                    const polyline = new kakao.maps.Polyline({
+                        path: path,
+                        strokeWeight: 4,
+                        strokeColor: '#ff3b3b',
+                        strokeOpacity: 0.8,
+                        strokeStyle: 'solid'
+                    });
+                    polyline.setMap(map);
+                });
+
         });
     };
     document.head.appendChild(script);
 </script>
-</body>
-</html>
