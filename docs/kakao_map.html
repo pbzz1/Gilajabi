@@ -61,30 +61,6 @@
                 strokeStyle: 'solid'
               });
               polyline.setMap(map);
-
-              // 시작 마커
-              const startMarker = new kakao.maps.Marker({
-                position: path[0],
-                map: map
-              });
-              const startInfo = new kakao.maps.InfoWindow({
-                content: `<div style="padding:5px; font-weight:bold; color:${course.color};">
-                  ${course.number}코스 ${course.name}</div>`,
-                removable: true
-              });
-              addHoverEvents(startMarker, startInfo);
-
-              // 끝 마커
-              const endMarker = new kakao.maps.Marker({
-                position: path[path.length - 1],
-                map: map
-              });
-              const endInfo = new kakao.maps.InfoWindow({
-                content: `<div style="padding:5px; font-weight:bold; color:${course.color};">
-                  ${course.number}코스 ${course.name}</div>`,
-                removable: true
-              });
-              addHoverEvents(endMarker, endInfo);
             });
         });
       });
