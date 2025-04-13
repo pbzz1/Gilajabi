@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>한양도성 콜아웃 지도</title>
+    <title>한양도성 전체 코스</title>
     <style>
         html, body, #map {
           width: 100%;
@@ -28,12 +28,12 @@
         const map = new kakao.maps.Map(container, options);
 
         const courses = [
-          { name: "baegak", label: "백악구간", color: "#5B3A29", start: [37.5927435, 126.9665319], labelPos: [37.5930435, 126.9663319] },
-          { name: "naksan", label: "낙산구간", color: "#007bff", start: [37.5878648, 127.0039567], labelPos: [37.5882648, 127.0041567] },
-          { name: "heunginjimun", label: "흥인지문구간", color: "#00b894", start: [37.571258, 127.010516], labelPos: [37.571558, 127.010816] },
-          { name: "namsan", label: "남산구간", color: "#e74c3c", start: [37.5579475, 127.0079613], labelPos: [37.5582475, 127.0076613] },
-          { name: "sungnyemun", label: "숭례문구간", color: "#f39c12", start: [37.5558457, 126.977199], labelPos: [37.5562457, 126.977099] },
-          { name: "inwangsan", label: "인왕산구간", color: "#8e44ad", start: [37.568331, 126.968873], labelPos: [37.568831, 126.968973] }
+          { name: "baegak", label: "백악구간", color: "#5B3A29" },
+          { name: "naksan", label: "낙산구간", color: "#007bff" },
+          { name: "heunginjimun", label: "흥인지문구간", color: "#00b894" },
+          { name: "namsan", label: "남산구간", color: "#e74c3c" },
+          { name: "sungnyemun", label: "숭례문구간", color: "#f39c12" },
+          { name: "inwangsan", label: "인왕산구간", color: "#8e44ad" }
         ];
 
         courses.forEach(course => {
@@ -42,6 +42,7 @@
             .then(data => {
               const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
 
+              // 지도에 선 추가
               const polyline = new kakao.maps.Polyline({
                 path: path,
                 strokeWeight: 4,
@@ -51,7 +52,11 @@
               });
               polyline.setMap(map);
 
-              // 커스텀 오버레이 (라인 + 라벨)
+              // 중간 지점에 라벨 위치
+              const midIndex = Math.floor(path.length / 2);
+              const labelPos = path[midIndex];
+
+              // Callout 스타일 라벨 HTML
               const lineHTML = `
                 <div style="position: relative;">
                   <div style="
@@ -77,7 +82,7 @@
                 </div>`;
 
               const overlay = new kakao.maps.CustomOverlay({
-                position: new kakao.maps.LatLng(course.labelPos[0], course.labelPos[1]),
+                position: labelPos,
                 content: lineHTML,
                 yAnchor: 0
               });
