@@ -1,30 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
-class PostTab extends StatefulWidget {
+class PostTab extends StatelessWidget {
   const PostTab({super.key});
 
   @override
-  State<PostTab> createState() => _PostTab();
-}
-
-class _PostTab extends State<PostTab> {
-  late final WebViewController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.parse('https://pbzz1.github.io/Gilajabi/kakao_map.html'));
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('주변 시설')),
-      body: WebViewWidget(controller: _controller),
+    return const Center(
+      child: Text('게시물 화면', style: TextStyle(fontSize: 24)),
     );
   }
 }
