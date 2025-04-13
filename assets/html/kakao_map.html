@@ -16,20 +16,19 @@
 <div id="map"></div>
 
 <script>
-    // ✅ Kakao Maps API 로드
     const script = document.createElement('script');
     script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d7e9c8ac8fea694b6444dc92bfdf6a1f&autoload=false";
     script.onload = function () {
         kakao.maps.load(function () {
             const container = document.getElementById('map');
             const options = {
-                center: new kakao.maps.LatLng(37.5878, 127.0040), // 낙산 중심
+                center: new kakao.maps.LatLng(37.5878, 127.0040),
                 level: 5
             };
             const map = new kakao.maps.Map(container, options);
 
-            // ✅ JSON 파일 GitHub Pages에서 로드
-            fetch('https://pbzz1.github.io/Gilajabi/docs/assets/json/naksan_path.json')
+            // ✅ ✅ 경로에서 /docs 생략하고 JSON 불러오기
+            fetch('assets/json/naksan_path.json')
                 .then(res => res.json())
                 .then(data => {
                     const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
