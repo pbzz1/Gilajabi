@@ -42,6 +42,7 @@
             .then(data => {
               const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
 
+              // Polyline 표시
               const polyline = new kakao.maps.Polyline({
                 path: path,
                 strokeWeight: 4,
@@ -51,10 +52,20 @@
               });
               polyline.setMap(map);
 
+              // ✅ Polyline 클릭 시 Flutter로 메시지 전송
+              kakao.maps.event.addListener(polyline, 'click', function () {
+                if (window.flutter_inappwebview) {
+                  window.flutter_inappwebview.callHandler('onCourseClick', course.name);
+                } else if (window.ReactNativeWebView) {
+                  window.ReactNativeWebView.postMessage(course.name); // fallback
+                } else {
+                  console.log("Clicked:", course.name);
+                }
+              });
+
+              // 중간 지점 라벨
               const midIndex = Math.floor(path.length / 2);
               const labelPos = path[midIndex];
-
-              // 텍스트만 표시하는 오버레이 (Callout 선 제거)
               const labelHTML = `
                 <div style="
                   padding: 6px 10px;
@@ -68,7 +79,6 @@
                 ">
                   ${course.label}
                 </div>`;
-
               const overlay = new kakao.maps.CustomOverlay({
                 position: labelPos,
                 content: labelHTML,
