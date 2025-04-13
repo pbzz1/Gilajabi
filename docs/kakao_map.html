@@ -5,28 +5,48 @@
     <title>Kakao Map</title>
     <style>
         html, body, #map {
-          width: 100%;
-          height: 100%;
-          margin: 0;
-          padding: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
         }
     </style>
 </head>
 <body>
 <div id="map"></div>
 
-<!-- ✅ Kakao SDK 동적 로딩 -->
 <script>
     const script = document.createElement('script');
     script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d7e9c8ac8fea694b6444dc92bfdf6a1f&autoload=false";
-    script.onload = function () {      kakao.maps.load(function () {
-        const container = document.getElementById('map');
-        const options = {
-          center: new kakao.maps.LatLng(37.5665, 126.9780),
-          level: 3
-        };
-        const map = new kakao.maps.Map(container, options);
-      });
+    script.onload = function () {
+        kakao.maps.load(function () {
+            const container = document.getElementById('map');
+            const options = {
+                center: new kakao.maps.LatLng(37.5878, 127.0040), // 낙산 중심 좌표
+                level: 5
+            };
+            const map = new kakao.maps.Map(container, options);
+
+            // ✅ 낙산구간 경로 (예시 좌표 5개만)
+            const naksanPath = [
+                new kakao.maps.LatLng(37.5878648, 127.0039567),
+                new kakao.maps.LatLng(37.5877798, 127.003942),
+                new kakao.maps.LatLng(37.5876831, 127.0039929),
+                new kakao.maps.LatLng(37.58758, 127.0040479),
+                new kakao.maps.LatLng(37.5876002, 127.004111)
+                // ... 여기에 전체 좌표 이어붙이면 됩니다
+            ];
+
+            const polyline = new kakao.maps.Polyline({
+                path: naksanPath,
+                strokeWeight: 4,
+                strokeColor: '#007bff',
+                strokeOpacity: 0.8,
+                strokeStyle: 'solid'
+            });
+
+            polyline.setMap(map);
+        });
     };
 
     document.head.appendChild(script);
