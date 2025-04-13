@@ -72,8 +72,8 @@
                     polyline.setMap(map);
                 });
 
-            // 4코스 남산문구간
-            fetch('assets/json/heunginjimun_path.json')
+            // 4코스 남산구간
+            fetch('assets/json/namsan_path.json')
                 .then(res => res.json())
                 .then(data => {
                     const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
@@ -88,7 +88,7 @@
                 });
 
             // 5코스 숭례문구간
-            fetch('assets/json/heunginjimun_path.json')
+            fetch('assets/json/sungnyemun_path.json')
                 .then(res => res.json())
                 .then(data => {
                     const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
@@ -103,7 +103,7 @@
                 });
 
             // 6코스 인왕산구간
-            fetch('assets/json/heunginjimun_path.json')
+            fetch('assets/json/inwangsan_path.json')
                 .then(res => res.json())
                 .then(data => {
                     const path = data.map(coord => new kakao.maps.LatLng(coord[0], coord[1]));
