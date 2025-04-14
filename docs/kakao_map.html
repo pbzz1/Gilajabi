@@ -11,63 +11,67 @@
           padding: 0;
         }
     </style>
+    <!-- ✅ Kakao Maps SDK: autoload=true (default) -->
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=d7e9c8ac8fea694b6444dc92bfdf6a1f"></script>
 </head>
 <body>
 <div id="map"></div>
 
 <script>
-    const script = document.createElement('script');
-    script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d7e9c8ac8fea694b6444dc92bfdf6a1f&autoload=false";
-    script.onload = function () {
-      kakao.maps.load(function () {
-        const container = document.getElementById('map');
-        const options = {
-          center: new kakao.maps.LatLng(37.5878, 127.0040),
-          level: 5
-        };
-        const map = new kakao.maps.Map(container, options);
+    const container = document.getElementById('map');
+    const options = {
+      center: new kakao.maps.LatLng(37.5878, 127.0040),
+      level: 5
+    };
+    const map = new kakao.maps.Map(container, options);
 
-        const courses = [
-          { name: "baegak", label: "1코스 백악구간", color: "#5B3A29" },
-          { name: "naksan", label: "2코스 낙산구간", color: "#007bff" },
-          { name: "heunginjimun", label: "3코스 흥인지문구간", color: "#00b894" },
-          { name: "namsan", label: "4코스 남산구간", color: "#e74c3c" },
-          { name: "sungnyemun", label: "5코스 숭례문구간", color: "#f39c12" },
-          { name: "inwangsan", label: "6코스 인왕산구간", color: "#8e44ad" }
-        ];
+    const courses = [
+      { name: "baegak", label: "1코스 백악구간", color: "#5B3A29" },
+      { name: "naksan", label: "2코스 낙산구간", color: "#007bff" },
+      { name: "heunginjimun", label: "3코스 흥인지문구간", color: "#00b894" },
+      { name: "namsan", label: "4코스 남산구간", color: "#e74c3c" },
+      { name: "sungnyemun", label: "5코스 숭례문구간", color: "#f39c12" },
+      { name: "inwangsan", label: "6코스 인왕산구간", color: "#8e44ad" }
+    ];
 
-        courses.forEach(course => {
-          fetch(`assets/json/${course.name}_path.json`)
-            .then(res => res.json())
-            .then(data => {
-              const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
+    courses.forEach(course => {
+      fetch(`assets/json/${course.name}_path.json`)
+        .then(res => res.json())
+        .then(data => {
+          const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
 
-              // Polyline 표시
-              const polyline = new kakao.maps.Polyline({
-                path: path,
-                strokeWeight: 4,
-                strokeColor: course.color,
-                strokeOpacity: 0.8,
-                strokeStyle: 'solid'
-              });
-              polyline.setMap(map);
+          // ⚡ 시각용 얇은 Polyline
+          const polyline = new kakao.maps.Polyline({
+            path: path,
+            strokeWeight: 4,
+            strokeColor: course.color,
+            strokeOpacity: 0.8,
+            strokeStyle: 'solid'
+          });
+          polyline.setMap(map);
 
-              // ✅ Polyline 클릭 시 Flutter로 메시지 전송
-              kakao.maps.event.addListener(polyline, 'click', function () {
-                if (window.CourseChannel) {
-                  window.CourseChannel.postMessage(course.name);
-                } else if (window.ReactNativeWebView) {
-                  window.ReactNativeWebView.postMessage(course.name); // fallback
-                } else {
-                  console.log("Clicked:", course.name);
-                }
-              });
+          // ✅ 클릭 판정용 투명 Polyline
+          const hitLine = new kakao.maps.Polyline({
+            path: path,
+            strokeWeight: 20,
+            strokeColor: 'transparent',
+            strokeOpacity: 0
+          });
+          hitLine.setMap(map);
 
-              // 중간 지점 라벨
-              const midIndex = Math.floor(path.length / 2);
-              const labelPos = path[midIndex];
-              const labelHTML = `
-                <div style="
+          kakao.maps.event.addListener(hitLine, 'click', function () {
+            if (window.CourseChannel) {
+              window.CourseChannel.postMessage(course.name);
+            }
+          });
+
+          // ✅ 중간 라벨 클릭 가능
+          const midIndex = Math.floor(path.length / 2);
+          const labelPos = path[midIndex];
+          const labelHTML = `
+            <div onclick="window.CourseChannel?.postMessage('${course.name}')"
+                 style="
+                  cursor: pointer;
                   padding: 6px 10px;
                   background: white;
                   border: 2px solid ${course.color};
@@ -75,21 +79,17 @@
                   font-weight: bold;
                   border-radius: 8px;
                   box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
-                  white-space: nowrap;
-                ">
-                  ${course.label}
-                </div>`;
-              const overlay = new kakao.maps.CustomOverlay({
-                position: labelPos,
-                content: labelHTML,
-                yAnchor: 1
-              });
-              overlay.setMap(map);
-            });
+                  white-space: nowrap;">
+              ${course.label}
+            </div>`;
+          const overlay = new kakao.maps.CustomOverlay({
+            position: labelPos,
+            content: labelHTML,
+            yAnchor: 1
+          });
+          overlay.setMap(map);
         });
-      });
-    };
-    document.head.appendChild(script);
+    });
 </script>
 </body>
 </html>
