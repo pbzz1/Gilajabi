@@ -51,10 +51,24 @@ class _BoardPageState extends State<BoardPage> {
               final doc = docs[index];
               final data = doc.data() as Map<String, dynamic>;
               final isAuthor = data['authorId'] == userId;
+              final List<dynamic> likes = data['likes'] ?? [];
 
               return ListTile(
                 title: Text(data['title'] ?? '제목 없음'),
-                subtitle: Text(data['content'] ?? ''),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(data['content'] ?? ''),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.favorite, size: 16, color: Colors.red),
+                        const SizedBox(width: 4),
+                        Text('${likes.length}')
+                      ],
+                    )
+                  ],
+                ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -76,7 +90,7 @@ class _BoardPageState extends State<BoardPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => PostDetailPage(
-                        postId: doc.id, // ✅ 댓글 기능 위해 postId 전달 추가됨
+                        postId: doc.id,
                         title: data['title'] ?? '제목 없음',
                         content: data['content'] ?? '',
                         authorNickname: data['authorNickname'] ?? '',
@@ -125,6 +139,7 @@ class _BoardPageState extends State<BoardPage> {
                   'content': content,
                   'authorId': userId,
                   'authorNickname': nickname,
+                  'likes': [],
                   'createdAt': FieldValue.serverTimestamp(),
                 });
               }

@@ -25,12 +25,14 @@ class PostDetailPage extends StatefulWidget {
 class _PostDetailPageState extends State<PostDetailPage> {
   String? nickname;
   String? userId;
+  List<dynamic> likes = [];
   final TextEditingController _commentController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadUserInfo();
+    _loadLikes();
   }
 
   Future<void> _loadUserInfo() async {
@@ -43,6 +45,31 @@ class _PostDetailPageState extends State<PostDetailPage> {
     } catch (e) {
       print('사용자 정보 로딩 실패: $e');
     }
+  }
+
+  Future<void> _loadLikes() async {
+    if (widget.postId == null) return;
+    final doc = await FirebaseFirestore.instance.collection('posts').doc(widget.postId).get();
+    setState(() {
+      likes = doc.data()?['likes'] ?? [];
+    });
+  }
+
+  Future<void> _toggleLike() async {
+    if (widget.postId == null || userId == null) return;
+    final docRef = FirebaseFirestore.instance.collection('posts').doc(widget.postId);
+    final isLiked = likes.contains(userId);
+
+    if (isLiked) {
+      await docRef.update({
+        'likes': FieldValue.arrayRemove([userId])
+      });
+    } else {
+      await docRef.update({
+        'likes': FieldValue.arrayUnion([userId])
+      });
+    }
+    _loadLikes();
   }
 
   Future<void> _addComment() async {
@@ -63,12 +90,70 @@ class _PostDetailPageState extends State<PostDetailPage> {
     _commentController.clear();
   }
 
+  void _editComment(String docId, String currentContent) {
+    final controller = TextEditingController(text: currentContent);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('댓글 수정'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(labelText: '댓글'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
+          ElevatedButton(
+            onPressed: () async {
+              final newContent = controller.text.trim();
+              if (newContent.isNotEmpty) {
+                await FirebaseFirestore.instance
+                    .collection('posts')
+                    .doc(widget.postId)
+                    .collection('comments')
+                    .doc(docId)
+                    .update({'content': newContent});
+              }
+              Navigator.pop(context);
+            },
+            child: const Text('수정'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteComment(String docId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('댓글 삭제'),
+        content: const Text('댓글을 삭제하시겠습니까?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('삭제')),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(widget.postId)
+          .collection('comments')
+          .doc(docId)
+          .delete();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final formattedDate = widget.createdAt != null
         ? '${widget.createdAt!.year}-${widget.createdAt!.month.toString().padLeft(2, '0')}-${widget.createdAt!.day.toString().padLeft(2, '0')} '
           '${widget.createdAt!.hour}:${widget.createdAt!.minute.toString().padLeft(2, '0')}'
         : '날짜 없음';
+
+    final isLiked = userId != null && likes.contains(userId);
 
     return Scaffold(
       appBar: AppBar(title: const Text('글 상세보기')),
@@ -81,6 +166,18 @@ class _PostDetailPageState extends State<PostDetailPage> {
             const SizedBox(height: 8),
             Text('작성자: ${widget.authorNickname}'),
             Text('작성일: $formattedDate'),
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    isLiked ? Icons.favorite : Icons.favorite_border,
+                    color: isLiked ? Colors.red : null,
+                  ),
+                  onPressed: _toggleLike,
+                ),
+                Text('${likes.length}')
+              ],
+            ),
             const Divider(height: 32),
             Text(widget.content, style: const TextStyle(fontSize: 18)),
             const Divider(height: 32),
@@ -106,10 +203,27 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         return ListView.builder(
                           itemCount: comments.length,
                           itemBuilder: (context, index) {
-                            final comment = comments[index].data() as Map<String, dynamic>;
+                            final doc = comments[index];
+                            final comment = doc.data() as Map<String, dynamic>;
+                            final isMine = comment['authorId'] == userId;
                             return ListTile(
                               title: Text(comment['content'] ?? ''),
                               subtitle: Text(comment['authorNickname'] ?? ''),
+                              trailing: isMine
+                                  ? Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.edit, size: 20),
+                                          onPressed: () => _editComment(doc.id, comment['content']),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete, size: 20),
+                                          onPressed: () => _deleteComment(doc.id),
+                                        ),
+                                      ],
+                                    )
+                                  : null,
                             );
                           },
                         );
