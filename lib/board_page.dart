@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'post_detail_page.dart';
 
 class BoardPage extends StatefulWidget {
   const BoardPage({super.key});
@@ -70,6 +71,20 @@ class _BoardPageState extends State<BoardPage> {
                     ],
                   ],
                 ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PostDetailPage(
+                        postId: doc.id, // ✅ 댓글 기능 위해 postId 전달 추가됨
+                        title: data['title'] ?? '제목 없음',
+                        content: data['content'] ?? '',
+                        authorNickname: data['authorNickname'] ?? '',
+                        createdAt: data['createdAt']?.toDate(),
+                      ),
+                    ),
+                  );
+                },
               );
             },
           );
