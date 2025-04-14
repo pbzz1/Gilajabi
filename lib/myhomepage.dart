@@ -31,7 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('모바일 캡스톤디자인'),
+        title: const Text('길라잡이'),
       ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
