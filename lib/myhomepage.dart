@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/home_tab.dart';
-import 'screens/post_tab.dart';
+import 'screens/board_page.dart';
 import 'screens/profile_tab.dart';
 
 
@@ -17,7 +17,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final List<Widget> _screens = [
     const HomeTab(),
-    const PostTab(),
+    const BoardPage(),
     const ProfileTab(),
   ];
 
@@ -31,7 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('모바일 캡스톤디자인'),
+        title: const Text('길라잡이'),
       ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
