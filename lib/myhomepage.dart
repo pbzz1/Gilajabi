@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/home_tab.dart';
-import 'screens/post_tab.dart';
+import 'screens/board_page.dart';
 import 'screens/profile_tab.dart';
 
 
@@ -17,7 +17,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final List<Widget> _screens = [
     const HomeTab(),
-    const PostTab(),
+    const BoardPage(),
     const ProfileTab(),
   ];
 
