@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "436884266886",
+    "project_id": "gilajabi-b182c",
+    "storage_bucket": "gilajabi-b182c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:436884266886:android:68c3242f8cd858d08f5607",
+        "android_client_info": {
+          "package_name": "com.example.gilajabi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFfl_5sx4CHKNlq__RCDS5GiN-G98gYYI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

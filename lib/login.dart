@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'myhomepage.dart';
 
 class LoginPage extends StatelessWidget {
@@ -23,13 +24,24 @@ class LoginPage extends StatelessWidget {
         print('카카오계정으로 로그인 성공');
       }
 
-      // 로그인 성공 시 홈 화면으로 이동
+      // 사용자 정보 가져오기
+      final user = await UserApi.instance.me();
+      final userId = user.id.toString();
+      final nickname = user.kakaoAccount?.profile?.nickname;
+      final profileImageUrl = user.kakaoAccount?.profile?.profileImageUrl;
+
+      // Firestore 저장
+      await FirebaseFirestore.instance.collection('users').doc(userId).set({
+        'nickname': nickname,
+        'profileImageUrl': profileImageUrl,
+        'lastLogin': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      // 홈으로 이동
       if (context.mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => const MyHomePage(),
-          ),
+          MaterialPageRoute(builder: (context) => const MyHomePage()),
         );
       }
     } catch (error) {
