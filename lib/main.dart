@@ -8,8 +8,8 @@ void main() async {
   await Firebase.initializeApp();
 
   KakaoSdk.init(
-    nativeAppKey: '3ebaf77a3cdfa4fa2a2e1d2388694936',
-    javaScriptAppKey: 'd7e9c8ac8fea694b6444dc92bfdf6a1f',
+    nativeAppKey: '8b3cd8ee84d00cc92cd9a8940f9aa837',
+    javaScriptAppKey: '8d8465643b5de1002ccbe7b3197fd029',
   );
 
   runApp(const MyApp());
