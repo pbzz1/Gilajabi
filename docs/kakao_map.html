@@ -42,7 +42,7 @@
             .then(data => {
               const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
 
-              // ⚡ 시각용 얇은 Polyline
+              // Polyline 표시
               const polyline = new kakao.maps.Polyline({
                 path: path,
                 strokeWeight: 4,
@@ -52,41 +52,31 @@
               });
               polyline.setMap(map);
 
-              // ✅ 클릭 판정용 투명 Polyline
-              const hitPolyline = new kakao.maps.Polyline({
-                path: path,
-                strokeWeight: 20,
-                strokeColor: 'transparent',
-                strokeOpacity: 0
-              });
-              hitPolyline.setMap(map);
-
-              // 터치 시 Flutter로 메시지 전달
-              kakao.maps.event.addListener(hitPolyline, 'click', function () {
+              // ✅ Polyline 클릭 시 Flutter로 메시지 전송
+              kakao.maps.event.addListener(polyline, 'click', function () {
                 if (window.CourseChannel) {
                   window.CourseChannel.postMessage(course.name);
                 } else if (window.ReactNativeWebView) {
-                  window.ReactNativeWebView.postMessage(course.name);
+                  window.ReactNativeWebView.postMessage(course.name); // fallback
                 } else {
                   console.log("Clicked:", course.name);
                 }
               });
 
-              // ✅ 중간 지점 라벨 (클릭 가능하게)
+              // 중간 지점 라벨
               const midIndex = Math.floor(path.length / 2);
               const labelPos = path[midIndex];
               const labelHTML = `
-                <div onclick="window.CourseChannel?.postMessage('${course.name}')"
-                     style="
-                      cursor: pointer;
-                      padding: 6px 10px;
-                      background: white;
-                      border: 2px solid ${course.color};
-                      color: ${course.color};
-                      font-weight: bold;
-                      border-radius: 8px;
-                      box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
-                      white-space: nowrap;">
+                <div style="
+                  padding: 6px 10px;
+                  background: white;
+                  border: 2px solid ${course.color};
+                  color: ${course.color};
+                  font-weight: bold;
+                  border-radius: 8px;
+                  box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+                  white-space: nowrap;
+                ">
                   ${course.label}
                 </div>`;
               const overlay = new kakao.maps.CustomOverlay({
