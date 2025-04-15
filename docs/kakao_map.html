@@ -1,95 +1,166 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
-    <title>한양도성 전체 코스</title>
-    <style>
-        html, body, #map {
-          width: 100%;
-          height: 100%;
-          margin: 0;
-          padding: 0;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <title>한양도성 전체 코스</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    #button-container {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .map-button {
+      padding: 8px 14px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      background-color: #ffffffee;
+      box-shadow: 0px 2px 4px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+
+    .map-button:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
 </head>
 <body>
-<div id="map"></div>
+<div id="map">
+  <div id="button-container">
+    <button class="map-button" onclick="moveToUser()">📍 내 위치 보기</button>
+    <button class="map-button" onclick="moveToDefault()">🏯 한양도성 보기</button>
+  </div>
+</div>
 
 <script>
-    const script = document.createElement('script');
-    script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=d7e9c8ac8fea694b6444dc92bfdf6a1f&autoload=false";
-    script.onload = function () {
-      kakao.maps.load(function () {
-        const container = document.getElementById('map');
-        const options = {
-          center: new kakao.maps.LatLng(37.5878, 127.0040),
-          level: 5
-        };
-        const map = new kakao.maps.Map(container, options);
+  const script = document.createElement('script');
+  script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=8d8465643b5de1002ccbe7b3197fd029&autoload=false";
+  script.onload = function () {
+    kakao.maps.load(function () {
+      const defaultCenter = new kakao.maps.LatLng(37.5878, 127.0040);
+      const container = document.getElementById('map');
+      const map = new kakao.maps.Map(container, {
+        center: defaultCenter,
+        level: 5
+      });
 
-        const courses = [
-          { name: "baegak", label: "1코스 백악구간", color: "#5B3A29" },
-          { name: "naksan", label: "2코스 낙산구간", color: "#007bff" },
-          { name: "heunginjimun", label: "3코스 흥인지문구간", color: "#00b894" },
-          { name: "namsan", label: "4코스 남산구간", color: "#e74c3c" },
-          { name: "sungnyemun", label: "5코스 숭례문구간", color: "#f39c12" },
-          { name: "inwangsan", label: "6코스 인왕산구간", color: "#8e44ad" }
-        ];
+      let userMarker = null;
+      let userLatLng = null;
 
-        courses.forEach(course => {
-          fetch(`assets/json/${course.name}_path.json`)
-            .then(res => res.json())
-            .then(data => {
-              const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
+      window.setUserLocation = function(lat, lng) {
+        userLatLng = new kakao.maps.LatLng(lat, lng);
 
-              // Polyline 표시
-              const polyline = new kakao.maps.Polyline({
-                path: path,
-                strokeWeight: 4,
-                strokeColor: course.color,
-                strokeOpacity: 0.8,
-                strokeStyle: 'solid'
-              });
-              polyline.setMap(map);
+        if (userMarker) userMarker.setMap(null);
 
-              // ✅ Polyline 클릭 시 Flutter로 메시지 전송
-              kakao.maps.event.addListener(polyline, 'click', function () {
+        userMarker = new kakao.maps.Marker({
+          position: userLatLng,
+          map: map,
+          title: '현재 위치',
+          image: new kakao.maps.MarkerImage(
+            'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+            new kakao.maps.Size(40, 40)
+          )
+        });
+
+        map.setCenter(userLatLng);
+      };
+
+      window.moveToUser = function () {
+        if (userLatLng) {
+          map.setCenter(userLatLng);
+        } else {
+          alert("현재 위치 정보가 없습니다.");
+        }
+      };
+
+      window.moveToDefault = function () {
+        map.setCenter(defaultCenter);
+      };
+
+      const courses = [
+        { name: "baegak", label: "1코스 백악구간", color: "#5B3A29" },
+        { name: "naksan", label: "2코스 낙산구간", color: "#007bff" },
+        { name: "heunginjimun", label: "3코스 흥인지문구간", color: "#00b894" },
+        { name: "namsan", label: "4코스 남산구간", color: "#e74c3c" },
+        { name: "sungnyemun", label: "5코스 숭례문구간", color: "#f39c12" },
+        { name: "inwangsan", label: "6코스 인왕산구간", color: "#8e44ad" }
+      ];
+
+      courses.forEach(course => {
+        fetch(`assets/json/${course.name}_path.json`)
+          .then(res => res.json())
+          .then(data => {
+            const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
+
+            const polyline = new kakao.maps.Polyline({
+              path: path,
+              strokeWeight: 4,
+              strokeColor: course.color,
+              strokeOpacity: 0.8,
+              strokeStyle: 'solid'
+            });
+            polyline.setMap(map);
+
+            const hitLine = new kakao.maps.Polyline({
+              path: path,
+              strokeWeight: 20,
+              strokeColor: 'transparent',
+              strokeOpacity: 0.01
+            });
+            hitLine.setMap(map);
+
+            [polyline, hitLine].forEach(line => {
+              kakao.maps.event.addListener(line, 'click', function () {
                 if (window.CourseChannel) {
                   window.CourseChannel.postMessage(course.name);
-                } else if (window.ReactNativeWebView) {
-                  window.ReactNativeWebView.postMessage(course.name); // fallback
-                } else {
-                  console.log("Clicked:", course.name);
                 }
               });
-
-              // 중간 지점 라벨
-              const midIndex = Math.floor(path.length / 2);
-              const labelPos = path[midIndex];
-              const labelHTML = `
-                <div style="
-                  padding: 6px 10px;
-                  background: white;
-                  border: 2px solid ${course.color};
-                  color: ${course.color};
-                  font-weight: bold;
-                  border-radius: 8px;
-                  box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
-                  white-space: nowrap;
-                ">
-                  ${course.label}
-                </div>`;
-              const overlay = new kakao.maps.CustomOverlay({
-                position: labelPos,
-                content: labelHTML,
-                yAnchor: 1
-              });
-              overlay.setMap(map);
             });
-        });
+
+            const midIndex = Math.floor(path.length / 2);
+            const labelPos = path[midIndex];
+            const labelHTML = `
+              <div onclick="window.CourseChannel?.postMessage('${course.name}')"
+                   style="
+                    cursor: pointer;
+                    padding: 6px 10px;
+                    background: white;
+                    border: 2px solid ${course.color};
+                    color: ${course.color};
+                    font-weight: bold;
+                    border-radius: 8px;
+                    box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+                    white-space: nowrap;">
+                ${course.label}
+              </div>`;
+            const overlay = new kakao.maps.CustomOverlay({
+              position: labelPos,
+              content: labelHTML,
+              yAnchor: 1
+            });
+            overlay.setMap(map);
+          });
       });
-    };
-    document.head.appendChild(script);
+    });
+  };
+  document.head.appendChild(script);
 </script>
 </body>
 </html>
