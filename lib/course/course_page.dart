@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'baegak_info_page.dart';
 import 'naksan_info_page.dart';
@@ -28,7 +29,6 @@ class _CoursePageState extends State<CoursePage> {
         'CourseChannel',
         onMessageReceived: (message) {
           final course = message.message;
-          print("📦 받은 메시지: $course");
           switch (course) {
             case 'baegak':
               Navigator.push(context, MaterialPageRoute(builder: (_) => const BaegakInfoPage()));
@@ -51,7 +51,33 @@ class _CoursePageState extends State<CoursePage> {
           }
         },
       )
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageFinished: (_) => _sendCurrentLocation(),
+        ),
+      )
       ..loadRequest(Uri.parse('https://pbzz1.github.io/Gilajabi/kakao_map.html'));
+  }
+
+  Future<void> _sendCurrentLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) return;
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) return;
+      }
+
+      if (permission == LocationPermission.deniedForever) return;
+
+      final position = await Geolocator.getCurrentPosition();
+      final js = "window.setUserLocation(${position.latitude}, ${position.longitude});";
+      _controller.runJavaScript(js);
+    } catch (e) {
+      print('❌ 위치 전송 실패: $e');
+    }
   }
 
   @override

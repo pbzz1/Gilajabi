@@ -4,28 +4,95 @@
   <meta charset="utf-8" />
   <title>한양도성 전체 코스</title>
   <style>
-    html, body, #map {
-      width: 100%;
-      height: 100%;
+    html, body {
       margin: 0;
       padding: 0;
+      height: 100%;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    #button-container {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .map-button {
+      padding: 8px 14px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      background-color: #ffffffee;
+      box-shadow: 0px 2px 4px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+
+    .map-button:hover {
+      background-color: #f0f0f0;
     }
   </style>
 </head>
 <body>
-<div id="map"></div>
+<div id="map">
+  <div id="button-container">
+    <button class="map-button" onclick="moveToUser()">📍 내 위치 보기</button>
+    <button class="map-button" onclick="moveToDefault()">🏯 한양도성 보기</button>
+  </div>
+</div>
 
 <script>
   const script = document.createElement('script');
   script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=8d8465643b5de1002ccbe7b3197fd029&autoload=false";
   script.onload = function () {
     kakao.maps.load(function () {
+      const defaultCenter = new kakao.maps.LatLng(37.5878, 127.0040);
       const container = document.getElementById('map');
-      const options = {
-        center: new kakao.maps.LatLng(37.5878, 127.0040),
+      const map = new kakao.maps.Map(container, {
+        center: defaultCenter,
         level: 5
+      });
+
+      let userMarker = null;
+      let userLatLng = null;
+
+      window.setUserLocation = function(lat, lng) {
+        userLatLng = new kakao.maps.LatLng(lat, lng);
+
+        if (userMarker) userMarker.setMap(null);
+
+        userMarker = new kakao.maps.Marker({
+          position: userLatLng,
+          map: map,
+          title: '현재 위치',
+          image: new kakao.maps.MarkerImage(
+            'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+            new kakao.maps.Size(40, 40)
+          )
+        });
+
+        map.setCenter(userLatLng);
       };
-      const map = new kakao.maps.Map(container, options);
+
+      window.moveToUser = function () {
+        if (userLatLng) {
+          map.setCenter(userLatLng);
+        } else {
+          alert("현재 위치 정보가 없습니다.");
+        }
+      };
+
+      window.moveToDefault = function () {
+        map.setCenter(defaultCenter);
+      };
 
       const courses = [
         { name: "baegak", label: "1코스 백악구간", color: "#5B3A29" },
@@ -42,7 +109,6 @@
           .then(data => {
             const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
 
-            // ⚡ 얇은 시각용 폴리라인
             const polyline = new kakao.maps.Polyline({
               path: path,
               strokeWeight: 4,
@@ -52,32 +118,22 @@
             });
             polyline.setMap(map);
 
-            // ✅ 클릭 판정용 굵은 투명 폴리라인 (약간 불투명 처리)
             const hitLine = new kakao.maps.Polyline({
               path: path,
               strokeWeight: 20,
               strokeColor: 'transparent',
-              strokeOpacity: 0.01 // 완전 투명보다 이벤트 인식 안정적
+              strokeOpacity: 0.01
             });
             hitLine.setMap(map);
 
-            // ✅ 클릭 이벤트 - 얇은 선
-            kakao.maps.event.addListener(polyline, 'click', function () {
-              console.log("📌 polyline clicked:", course.name);
-              if (window.CourseChannel) {
-                window.CourseChannel.postMessage(course.name);
-              }
+            [polyline, hitLine].forEach(line => {
+              kakao.maps.event.addListener(line, 'click', function () {
+                if (window.CourseChannel) {
+                  window.CourseChannel.postMessage(course.name);
+                }
+              });
             });
 
-            // ✅ 클릭 이벤트 - 터치 판정용 선
-            kakao.maps.event.addListener(hitLine, 'click', function () {
-              console.log("📌 hitLine clicked:", course.name);
-              if (window.CourseChannel) {
-                window.CourseChannel.postMessage(course.name);
-              }
-            });
-
-            // ✅ 중간 라벨 오버레이 (클릭 가능)
             const midIndex = Math.floor(path.length / 2);
             const labelPos = path[midIndex];
             const labelHTML = `
