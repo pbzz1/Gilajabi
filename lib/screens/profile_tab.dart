@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../login.dart';
+import 'package:gilajabi/board/liked_posts_page.dart';
+import 'package:gilajabi/board/my_posts_page.dart';
 
 class ProfileTab extends StatefulWidget {
   const ProfileTab({super.key});
@@ -12,6 +15,7 @@ class ProfileTab extends StatefulWidget {
 class _ProfileTabState extends State<ProfileTab> {
   String? profileImageUrl;
   String? nickname;
+  String? userId;
 
   @override
   void initState() {
@@ -22,9 +26,12 @@ class _ProfileTabState extends State<ProfileTab> {
   Future<void> _loadUserInfo() async {
     try {
       final user = await UserApi.instance.me();
+      userId = user.id.toString();
+      profileImageUrl = user.kakaoAccount?.profile?.profileImageUrl;
+
+      final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
       setState(() {
-        profileImageUrl = user.kakaoAccount?.profile?.profileImageUrl;
-        nickname = user.kakaoAccount?.profile?.nickname;
+        nickname = doc.data()?['nickname'] ?? '사용자';
       });
     } catch (e) {
       print('사용자 정보 가져오기 실패: $e');
@@ -48,13 +55,21 @@ class _ProfileTabState extends State<ProfileTab> {
             child: const Text('취소'),
           ),
           TextButton(
-            onPressed: () {
-              setState(() {
-                nickname = _controller.text;
-              });
+            onPressed: () async {
+              final newNickname = _controller.text.trim();
+              if (newNickname.isNotEmpty && userId != null) {
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(userId)
+                    .update({'nickname': newNickname});
+
+                setState(() {
+                  nickname = newNickname;
+                });
+              }
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('닉네임이 "${_controller.text}"(으)로 변경됨')),
+                SnackBar(content: Text('닉네임이 "$newNickname"(으)로 변경됨')),
               );
             },
             child: const Text('저장'),
@@ -65,16 +80,20 @@ class _ProfileTabState extends State<ProfileTab> {
   }
 
   void _onMyPostsPressed() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('내가 쓴 글 보기 (추후 연결)')),
-    );
-  }
+  if (userId == null) return;
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (_) => MyPostsPage(userId: userId!)),
+  );
+}
 
   void _onLikedPostsPressed() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('좋아요한 글 보기 (추후 연결)')),
-    );
-  }
+  if (userId == null) return;
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (_) => LikedPostsPage(userId: userId!)),
+  );
+}
 
   void _logout() async {
     try {

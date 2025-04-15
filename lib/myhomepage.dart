@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/home_tab.dart';
-import 'board_page.dart';
+import 'board/board_page.dart';
 import 'screens/profile_tab.dart';
 
 

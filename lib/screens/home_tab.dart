@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gilajabi/screens/profile_tab.dart';
 import '../course/course_page.dart'; // 코스 선택 페이지 import (상대 경로)
-import '../board_page.dart'; // 게시판 페이지 import
+import '../board/board_page.dart'; // 게시판 페이지 import
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -78,22 +78,6 @@ class _HomeTabState extends State<HomeTab> {
     return Scaffold(
       body: Column(
         children: [
-          // 🔍 검색창
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: '검색어를 입력하세요',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Colors.grey[200],
-              ),
-            ),
-          ),
-
           // 🖼 배너
           SizedBox(
             height: 200,
