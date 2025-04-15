@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:gilajabi/screens/profile_tab.dart';
 import '../course/course_page.dart'; // 코스 선택 페이지 import (상대 경로)
 import '../board_page.dart'; // 게시판 페이지 import
 
@@ -150,7 +151,16 @@ class _HomeTabState extends State<HomeTab> {
                     );
                   },
                 ),
-                buildMenuButton(Icons.person, '프로필'),
+                buildMenuButton(
+                  Icons.person,
+                  '프로필'
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ProfileTab()),
+                    );
+                  },
+                ),
                 buildMenuButton(Icons.settings, '설정'),
                 buildMenuButton(Icons.notifications, '알림'),
                 buildMenuButton(Icons.info, '정보'),
