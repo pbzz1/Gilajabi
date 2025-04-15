@@ -16,8 +16,9 @@ class _HomeTabState extends State<HomeTab> {
 
   final List<String> _bannerImages = [
     'assets/images/homeBanner0.png',
-    'assets/images/banner1.jpg',
-    'assets/images/banner2.jpg',
+    'assets/images/homeBanner1.png',
+    'assets/images/homeBanner2.png',
+    'assets/images/homeBanner3.png',
   ];
 
   @override
