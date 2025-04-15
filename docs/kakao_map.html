@@ -61,6 +61,19 @@
         level: 5
       });
 
+  // ✅ 위치 정보 자동 요청
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function (position) {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      setUserLocation(lat, lng);
+    }, function (error) {
+      console.error("위치 정보를 가져오는 데 실패했습니다.", error);
+    });
+  } else {
+    alert("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
+  }
+      
       let userMarker = null;
       let userLatLng = null;
 
