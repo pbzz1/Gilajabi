@@ -28,16 +28,18 @@ class _BoardPageState extends State<BoardPage> {
   }
 
   Future<void> _loadUserInfo() async {
-    try {
-      final user = await UserApi.instance.me();
-      setState(() {
-        userId = user.id.toString();
-        nickname = user.kakaoAccount?.profile?.nickname ?? '알 수 없음';
-      });
-    } catch (e) {
-      print('사용자 정보 로딩 실패: $e');
-    }
+  try {
+    final user = await UserApi.instance.me();
+    userId = user.id.toString();
+
+    final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    setState(() {
+      nickname = doc.data()?['nickname'] ?? '사용자';
+    });
+  } catch (e) {
+    print('사용자 정보 로딩 실패: $e');
   }
+}
 
   Future<List<String>> _pickAndUploadImages() async {
     final picker = ImagePicker();
@@ -258,28 +260,35 @@ class _BoardPageState extends State<BoardPage> {
           actions: [
             TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
             ElevatedButton(
-              onPressed: isUploading
-                  ? null
-                  : () async {
-                      final title = titleController.text;
-                      final content = contentController.text;
+  onPressed: isUploading
+      ? null
+      : () async {
+          final title = titleController.text.trim();
+          final content = contentController.text.trim();
 
-                      if (title.isNotEmpty && content.isNotEmpty && userId != null && nickname != null) {
-                        await FirebaseFirestore.instance.collection('posts').add({
-                          'title': title,
-                          'content': content,
-                          'authorId': userId,
-                          'authorNickname': nickname,
-                          'likes': [],
-                          'imageUrls': uploadedImageUrls,
-                          'createdAt': FieldValue.serverTimestamp(),
-                        });
-                      }
+          if (title.isEmpty || content.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('제목과 내용을 모두 입력해 주세요')),
+            );
+            return;
+          }
 
-                      uploadedImageUrls = [];
-                      Navigator.pop(context);
-                    },
-              child: const Text('등록'),
+          if (userId != null && nickname != null) {
+            await FirebaseFirestore.instance.collection('posts').add({
+              'title': title,
+              'content': content,
+              'authorId': userId,
+              'authorNickname': nickname,
+              'likes': [],
+              'imageUrls': uploadedImageUrls,
+              'createdAt': FieldValue.serverTimestamp(),
+            });
+
+            uploadedImageUrls = [];
+            if (context.mounted) Navigator.pop(context);
+          }
+        },
+  child: const Text('등록'),
             ),
           ],
         ),

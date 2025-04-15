@@ -55,25 +55,46 @@ class _ProfileTabState extends State<ProfileTab> {
             child: const Text('취소'),
           ),
           TextButton(
-            onPressed: () async {
-              final newNickname = _controller.text.trim();
-              if (newNickname.isNotEmpty && userId != null) {
-                await FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(userId)
-                    .update({'nickname': newNickname});
+  onPressed: () async {
+    final newNickname = _controller.text.trim();
+    if (newNickname.isNotEmpty && userId != null) {
+      // 닉네임 업데이트
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'nickname': newNickname});
 
-                setState(() {
-                  nickname = newNickname;
-                });
-              }
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('닉네임이 "$newNickname"(으)로 변경됨')),
-              );
-            },
-            child: const Text('저장'),
-          ),
+      setState(() {
+        nickname = newNickname;
+      });
+
+      // 게시글의 작성자 이름 변경
+      final postsQuery = await FirebaseFirestore.instance
+          .collection('posts')
+          .where('authorId', isEqualTo: userId)
+          .get();
+
+      for (final postDoc in postsQuery.docs) {
+        // 게시글 닉네임 업데이트
+        await postDoc.reference.update({'authorNickname': newNickname});
+
+        // 댓글 닉네임 업데이트
+        final commentsQuery = await postDoc.reference.collection('comments').get();
+        for (final commentDoc in commentsQuery.docs) {
+          if (commentDoc.data()['authorId'] == userId) {
+            await commentDoc.reference.update({'authorNickname': newNickname});
+          }
+        }
+      }
+
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('닉네임이 "$newNickname"(으)로 변경됨')),
+      );
+    }
+  },
+  child: const Text('저장'),
+),
         ],
       ),
     );
