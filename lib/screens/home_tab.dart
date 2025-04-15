@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../course/course_page.dart'; // 코스 선택 페이지 import (상대 경로)
+import '../course/course_page.dart'; // 코스 선택 페이지 import
 
 class HomeTab extends StatefulWidget {
-  const HomeTab({super.key});
+  final void Function(int index) onTabSelected; // 👈 탭 전환 콜백
+
+  const HomeTab({super.key, required this.onTabSelected});
 
   @override
   State<HomeTab> createState() => _HomeTabState();
@@ -40,29 +42,32 @@ class _HomeTabState extends State<HomeTab> {
     super.dispose();
   }
 
-  Widget buildMenuButton(IconData icon, String label) {
-    return Container(
-      width: 90,
-      height: 90,
-      margin: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(2, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 30, color: Colors.black87),
-          const SizedBox(height: 8),
-          Text(label, style: const TextStyle(fontSize: 14)),
-        ],
+  Widget buildMenuButton(IconData icon, String label, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 90,
+        height: 90,
+        margin: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 4,
+              offset: Offset(2, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 30, color: Colors.black87),
+            const SizedBox(height: 8),
+            Text(label, style: const TextStyle(fontSize: 14)),
+          ],
+        ),
       ),
     );
   }
@@ -120,23 +125,30 @@ class _HomeTabState extends State<HomeTab> {
 
           const SizedBox(height: 20),
 
-          // 🎯 메뉴 버튼들 (코스 선택만 onTap 있음)
+          // 🎯 메뉴 버튼들
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Wrap(
               alignment: WrapAlignment.center,
               children: [
-                GestureDetector(
+                buildMenuButton(
+                  Icons.map,
+                  '코스 선택',
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const CoursePage()),
                     );
                   },
-                  child: buildMenuButton(Icons.map, '코스 선택'),
                 ),
-                buildMenuButton(Icons.post_add, '게시물'),
-                buildMenuButton(Icons.person, '프로필'),
+                buildMenuButton(Icons.post_add, '게시물'), // 추후 기능 연결 가능
+                buildMenuButton(
+                  Icons.person,
+                  '프로필',
+                  onTap: () {
+                    widget.onTabSelected(2); // 👉 프로필 탭 전환
+                  },
+                ),
                 buildMenuButton(Icons.settings, '설정'),
                 buildMenuButton(Icons.notifications, '알림'),
                 buildMenuButton(Icons.info, '정보'),
