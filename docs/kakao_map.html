@@ -23,17 +23,19 @@
       z-index: 10;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
     }
 
     .map-button {
-      padding: 8px 14px;
+      padding: 12px 20px;
+      font-size: 18px;
       font-weight: bold;
       border: none;
-      border-radius: 6px;
+      border-radius: 10px;
       background-color: #ffffffee;
-      box-shadow: 0px 2px 4px rgba(0,0,0,0.3);
+      box-shadow: 0px 3px 6px rgba(0,0,0,0.3);
       cursor: pointer;
+      min-width: 180px;
     }
 
     .map-button:hover {
@@ -61,19 +63,18 @@
         level: 5
       });
 
-  // ✅ 위치 정보 자동 요청
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function (position) {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-      setUserLocation(lat, lng);
-    }, function (error) {
-      console.error("위치 정보를 가져오는 데 실패했습니다.", error);
-    });
-  } else {
-    alert("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
-  }
-      
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          setUserLocation(lat, lng);
+        }, function (error) {
+          console.error("위치 정보를 가져오는 데 실패했습니다.", error);
+        });
+      } else {
+        alert("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
+      }
+
       let userMarker = null;
       let userLatLng = null;
 
@@ -122,34 +123,33 @@
           .then(data => {
             const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
 
-            // ⚡ 얇은 시각용 폴리라인
+            // ⚡ 더 굵게 변경된 시각용 폴리라인
             const polyline = new kakao.maps.Polyline({
               path: path,
-              strokeWeight: 4,
+              strokeWeight: 6, // ← 변경됨
               strokeColor: course.color,
               strokeOpacity: 0.8,
               strokeStyle: 'solid'
             });
             polyline.setMap(map);
 
-            // ✅ 클릭 판정용 굵은 투명 폴리라인 (약간 불투명 처리)
+            // ✅ 클릭 판정용 폴리라인: 두께 40으로 증가
             const hitLine = new kakao.maps.Polyline({
               path: path,
-              strokeWeight: 20,
+              strokeWeight: 40, // ← 변경됨
               strokeColor: 'transparent',
               strokeOpacity: 0.01
             });
             hitLine.setMap(map);
-            
-            // ✅ 클릭 이벤트 - 얇은 선
+
+            // 클릭 이벤트 연결
             kakao.maps.event.addListener(polyline, 'click', function () {
               console.log("📌 polyline clicked:", course.name);
               if (window.CourseChannel) {
                 window.CourseChannel.postMessage(course.name);
               }
             });
-            
-            // ✅ 클릭 이벤트 - 터치 판정용 선
+
             kakao.maps.event.addListener(hitLine, 'click', function () {
               console.log("📌 hitLine clicked:", course.name);
               if (window.CourseChannel) {
@@ -157,7 +157,6 @@
               }
             });
 
-            // ✅ 중간 라벨 오버레이 (클릭 가능)
             const midIndex = Math.floor(path.length / 2);
             const labelPos = path[midIndex];
             const labelHTML = `
