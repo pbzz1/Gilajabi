@@ -153,7 +153,7 @@ class _HomeTabState extends State<HomeTab> {
                 ),
                 buildMenuButton(
                   Icons.person,
-                  '프로필'
+                  '프로필',
                   onTap: () {
                     Navigator.push(
                       context,
