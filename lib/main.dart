@@ -1,11 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
-import 'app.dart'; // MyApp이 있는 파일
+import 'package:firebase_core/firebase_core.dart';
+import 'login.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
   KakaoSdk.init(
-    nativeAppKey: '3ebaf77a3cdfa4fa2a2e1d2388694936',
-    javaScriptAppKey: 'd7e9c8ac8fea694b6444dc92bfdf6a1f',
+    nativeAppKey: '8b3cd8ee84d00cc92cd9a8940f9aa837',
+    javaScriptAppKey: '8d8465643b5de1002ccbe7b3197fd029',
   );
+
   runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: LoginPage(),
+    );
+  }
 }
