@@ -17,9 +17,9 @@ class _HomeTabState extends State<HomeTab> {
   late Timer _timer;
 
   final List<String> _bannerImages = [
-    'assets/images/banner0.jpg',
-    'assets/images/banner1.jpg',
-    'assets/images/banner2.jpg',
+    'assets/images/banner0.png',
+    'assets/images/banner1.png',
+    'assets/images/banner2.png',
   ];
 
   @override
