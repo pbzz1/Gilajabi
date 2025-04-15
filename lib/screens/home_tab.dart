@@ -77,22 +77,6 @@ class _HomeTabState extends State<HomeTab> {
     return Scaffold(
       body: Column(
         children: [
-          // 🔍 검색창
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: '검색어를 입력하세요',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Colors.grey[200],
-              ),
-            ),
-          ),
-
           // 🖼 배너
           SizedBox(
             height: 200,

@@ -17,6 +17,9 @@ class _BoardPageState extends State<BoardPage> {
   String? nickname;
   String? userId;
   List<String> uploadedImageUrls = [];
+  bool _isSearching = false;
+  String _searchText = '';
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -27,11 +30,9 @@ class _BoardPageState extends State<BoardPage> {
   Future<void> _loadUserInfo() async {
     try {
       final user = await UserApi.instance.me();
-      userId = user.id.toString();
-
-      final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
       setState(() {
-        nickname = doc.data()?['nickname'] ?? '사용자';
+        userId = user.id.toString();
+        nickname = user.kakaoAccount?.profile?.nickname ?? '알 수 없음';
       });
     } catch (e) {
       print('사용자 정보 로딩 실패: $e');
@@ -58,7 +59,37 @@ class _BoardPageState extends State<BoardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('게시판')),
+      appBar: AppBar(
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: '검색어 입력',
+                  border: InputBorder.none,
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _searchText = value.toLowerCase();
+                  });
+                },
+              )
+            : const Text('게시판'),
+        actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                if (_isSearching) {
+                  _searchText = '';
+                  _searchController.clear();
+                }
+                _isSearching = !_isSearching;
+              });
+            },
+          ),
+        ],
+      ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('posts')
@@ -66,7 +97,12 @@ class _BoardPageState extends State<BoardPage> {
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-          final docs = snapshot.data!.docs;
+          final docs = snapshot.data!.docs.where((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            final title = data['title']?.toString().toLowerCase() ?? '';
+            final content = data['content']?.toString().toLowerCase() ?? '';
+            return title.contains(_searchText) || content.contains(_searchText);
+          }).toList();
 
           return ListView.builder(
             itemCount: docs.length,
@@ -192,9 +228,7 @@ class _BoardPageState extends State<BoardPage> {
                   onPressed: isUploading
                       ? null
                       : () async {
-                          setState(() {
-                            isUploading = true;
-                          });
+                          setState(() => isUploading = true);
                           final urls = await _pickAndUploadImages();
                           if (context.mounted) {
                             setState(() {
