@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gilajabi/screens/profile_tab.dart';
 import '../course/course_page.dart'; // 코스 선택 페이지 import (상대 경로)
-import '../board_page.dart'; // 게시판 페이지 import
+import '../board/board_page.dart'; // 게시판 페이지 import
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});

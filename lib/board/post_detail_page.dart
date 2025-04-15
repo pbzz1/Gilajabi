@@ -39,12 +39,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   Future<void> _loadUserInfo() async {
-    try {
-      final user = await UserApi.instance.me();
-      setState(() {
-        userId = user.id.toString();
-        nickname = user.kakaoAccount?.profile?.nickname ?? '알 수 없음';
-      });
+  try {
+    final user = await UserApi.instance.me();
+    userId = user.id.toString();
+
+    final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    setState(() {
+      nickname = doc.data()?['nickname'] ?? '사용자';
+    });
     } catch (e) {
       print('사용자 정보 로딩 실패: $e');
     }

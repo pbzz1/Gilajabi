@@ -27,9 +27,11 @@ class _BoardPageState extends State<BoardPage> {
   Future<void> _loadUserInfo() async {
     try {
       final user = await UserApi.instance.me();
+      userId = user.id.toString();
+
+      final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
       setState(() {
-        userId = user.id.toString();
-        nickname = user.kakaoAccount?.profile?.nickname ?? '알 수 없음';
+        nickname = doc.data()?['nickname'] ?? '사용자';
       });
     } catch (e) {
       print('사용자 정보 로딩 실패: $e');
