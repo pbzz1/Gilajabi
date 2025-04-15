@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:gilajabi/screens/profile_tab.dart';
 import '../course/course_page.dart'; // 코스 선택 페이지 import (상대 경로)
 
 class HomeTab extends StatefulWidget {
@@ -135,8 +136,16 @@ class _HomeTabState extends State<HomeTab> {
                   },
                   child: buildMenuButton(Icons.map, '코스 선택'),
                 ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ProfileTab()),
+                    );
+                  },
+                  child: buildMenuButton(Icons.person, '프로필'),
+                ),
                 buildMenuButton(Icons.post_add, '게시물'),
-                buildMenuButton(Icons.person, '프로필'),
                 buildMenuButton(Icons.settings, '설정'),
                 buildMenuButton(Icons.notifications, '알림'),
                 buildMenuButton(Icons.info, '정보'),
