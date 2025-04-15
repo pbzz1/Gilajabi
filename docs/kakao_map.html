@@ -122,6 +122,7 @@
           .then(data => {
             const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
 
+            // ⚡ 얇은 시각용 폴리라인
             const polyline = new kakao.maps.Polyline({
               path: path,
               strokeWeight: 4,
@@ -131,6 +132,7 @@
             });
             polyline.setMap(map);
 
+            // ✅ 클릭 판정용 굵은 투명 폴리라인 (약간 불투명 처리)
             const hitLine = new kakao.maps.Polyline({
               path: path,
               strokeWeight: 20,
@@ -138,15 +140,24 @@
               strokeOpacity: 0.01
             });
             hitLine.setMap(map);
-
-            [polyline, hitLine].forEach(line => {
-              kakao.maps.event.addListener(line, 'click', function () {
-                if (window.CourseChannel) {
-                  window.CourseChannel.postMessage(course.name);
-                }
-              });
+            
+            // ✅ 클릭 이벤트 - 얇은 선
+            kakao.maps.event.addListener(polyline, 'click', function () {
+              console.log("📌 polyline clicked:", course.name);
+              if (window.CourseChannel) {
+                window.CourseChannel.postMessage(course.name);
+              }
+            });
+            
+            // ✅ 클릭 이벤트 - 터치 판정용 선
+            kakao.maps.event.addListener(hitLine, 'click', function () {
+              console.log("📌 hitLine clicked:", course.name);
+              if (window.CourseChannel) {
+                window.CourseChannel.postMessage(course.name);
+              }
             });
 
+            // ✅ 중간 라벨 오버레이 (클릭 가능)
             const midIndex = Math.floor(path.length / 2);
             const labelPos = path[midIndex];
             const labelHTML = `
