@@ -69,23 +69,22 @@ class _ProfileTabState extends State<ProfileTab> {
       });
 
       // 게시글의 작성자 이름 변경
-      final postsQuery = await FirebaseFirestore.instance
-          .collection('posts')
-          .where('authorId', isEqualTo: userId)
-          .get();
-
-      for (final postDoc in postsQuery.docs) {
-        // 게시글 닉네임 업데이트
-        await postDoc.reference.update({'authorNickname': newNickname});
-
-        // 댓글 닉네임 업데이트
-        final commentsQuery = await postDoc.reference.collection('comments').get();
-        for (final commentDoc in commentsQuery.docs) {
-          if (commentDoc.data()['authorId'] == userId) {
-            await commentDoc.reference.update({'authorNickname': newNickname});
-          }
+      final allPosts = await FirebaseFirestore.instance.collection('posts').get();
+      for (final postDoc in allPosts.docs) {
+        final postRef = postDoc.reference;
+        // 게시글 작성자 닉네임 수정
+        if (postDoc.data()['authorId'] == userId) {
+          await postRef.update({'authorNickname': newNickname});
         }
-      }
+
+  // 댓글 중 내 댓글의 닉네임 수정
+  final commentsSnapshot = await postRef.collection('comments').get();
+  for (final commentDoc in commentsSnapshot.docs) {
+    if (commentDoc.data()['authorId'] == userId) {
+      await commentDoc.reference.update({'authorNickname': newNickname});
+    }
+  }
+}
 
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
