@@ -8,6 +8,7 @@ class PostDetailPage extends StatefulWidget {
   final String authorNickname;
   final DateTime? createdAt;
   final String? postId;
+  final List<String>? imageUrls;
 
   const PostDetailPage({
     super.key,
@@ -16,6 +17,7 @@ class PostDetailPage extends StatefulWidget {
     required this.authorNickname,
     this.createdAt,
     this.postId,
+    this.imageUrls,
   });
 
   @override
@@ -27,6 +29,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   String? userId;
   List<dynamic> likes = [];
   final TextEditingController _commentController = TextEditingController();
+  int currentPage = 0;
 
   @override
   void initState() {
@@ -61,13 +64,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
     final isLiked = likes.contains(userId);
 
     if (isLiked) {
-      await docRef.update({
-        'likes': FieldValue.arrayRemove([userId])
-      });
+      await docRef.update({'likes': FieldValue.arrayRemove([userId])});
     } else {
-      await docRef.update({
-        'likes': FieldValue.arrayUnion([userId])
-      });
+      await docRef.update({'likes': FieldValue.arrayUnion([userId])});
     }
     _loadLikes();
   }
@@ -150,7 +149,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   Widget build(BuildContext context) {
     final formattedDate = widget.createdAt != null
         ? '${widget.createdAt!.year}-${widget.createdAt!.month.toString().padLeft(2, '0')}-${widget.createdAt!.day.toString().padLeft(2, '0')} '
-          '${widget.createdAt!.hour}:${widget.createdAt!.minute.toString().padLeft(2, '0')}'
+            '${widget.createdAt!.hour}:${widget.createdAt!.minute.toString().padLeft(2, '0')}'
         : '날짜 없음';
 
     final isLiked = userId != null && likes.contains(userId);
@@ -179,6 +178,47 @@ class _PostDetailPageState extends State<PostDetailPage> {
               ],
             ),
             const Divider(height: 32),
+            if (widget.imageUrls != null && widget.imageUrls!.isNotEmpty)
+              Column(
+                children: [
+                  SizedBox(
+                    height: 250,
+                    child: PageView.builder(
+                      itemCount: widget.imageUrls!.length,
+                      onPageChanged: (index) => setState(() => currentPage = index),
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              widget.imageUrls![index],
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(widget.imageUrls!.length, (index) =>
+                      Container(
+                        width: 8,
+                        height: 8,
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: currentPage == index ? Colors.black : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            const SizedBox(height: 16),
             Text(widget.content, style: const TextStyle(fontSize: 18)),
             const Divider(height: 32),
             const Text('댓글', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
