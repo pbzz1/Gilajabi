@@ -1,17 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
-class NamsanInfoPage extends StatelessWidget {
-  const NamsanInfoPage({super.key});
+class NamsanInfoPage extends StatefulWidget {
+  const NamsanInfoPage({Key? key}) : super(key: key);
+
+  @override
+  State<NamsanInfoPage> createState() => _NamsanInfoPageState();
+}
+
+class _NamsanInfoPageState extends State<NamsanInfoPage> {
+  InAppWebViewController? webViewController;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("4코스 남산구간")),
-      body: const Padding(
-        padding: EdgeInsets.all(16),
-        child: Text(
-          "남산구간 설명",
-          style: TextStyle(fontSize: 16),
+      appBar: AppBar(title: const Text('4코스 남산구간')),
+      body: SafeArea(
+        child: InAppWebView(
+          initialUrlRequest: URLRequest(
+            url: WebUri(
+              "https://www.durunubi.kr/4-2-1-1-walk-mobility-view-detail.do?crs_idx=T_CRS_MNG0000003578",
+            ),
+          ),
+          initialSettings: InAppWebViewSettings(
+            javaScriptEnabled: true,
+            useOnLoadResource: true,
+            mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+          ),
+          onWebViewCreated: (controller) {
+            webViewController = controller;
+          },
         ),
       ),
     );
