@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import '../navigation_sample_page.dart';
+import '../stamp_points.dart';
+import '../tracking/course_tracking_page.dart';
 
 class SungnyemunInfoPage extends StatefulWidget {
   const SungnyemunInfoPage({Key? key}) : super(key: key);
@@ -39,7 +40,13 @@ class _SungnyemunInfoPageState extends State<SungnyemunInfoPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const NavigationSamplePage()),
+                  MaterialPageRoute(
+                    builder: (_) => CourseTrackingPage(
+                      courseName: '5코스 숭례문구간',
+                      polylineJsonFile: 'sungnyemun_path.json', // ✅ 여기를 JSON 파일명으로 변경
+                      stampPoints: sungnyemunStampPoints, // ✅ stamp_points.dart에서 불러온 리스트
+                    ),
+                  ),
                 );
               },
               child: const Text("이 코스 선택"),
