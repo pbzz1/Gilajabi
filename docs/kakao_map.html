@@ -63,20 +63,21 @@
         level: 5
       });
 
+      let userMarker = null;
+      let userLatLng = null;
+
+      // 위치는 불러오되 자동으로 이동하지 않음
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          setUserLocation(lat, lng);
+          userLatLng = new kakao.maps.LatLng(lat, lng);
         }, function (error) {
           console.error("위치 정보를 가져오는 데 실패했습니다.", error);
         });
       } else {
         alert("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
       }
-
-      let userMarker = null;
-      let userLatLng = null;
 
       window.setUserLocation = function(lat, lng) {
         userLatLng = new kakao.maps.LatLng(lat, lng);
@@ -92,12 +93,22 @@
             new kakao.maps.Size(40, 40)
           )
         });
-
-        map.setCenter(userLatLng);
       };
 
       window.moveToUser = function () {
         if (userLatLng) {
+          if (userMarker) userMarker.setMap(null);
+
+          userMarker = new kakao.maps.Marker({
+            position: userLatLng,
+            map: map,
+            title: '현재 위치',
+            image: new kakao.maps.MarkerImage(
+              'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+              new kakao.maps.Size(40, 40)
+            )
+          });
+
           map.setCenter(userLatLng);
         } else {
           alert("현재 위치 정보가 없습니다.");
@@ -123,35 +134,30 @@
           .then(data => {
             const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
 
-            // ⚡ 더 굵게 변경된 시각용 폴리라인
             const polyline = new kakao.maps.Polyline({
               path: path,
-              strokeWeight: 6, // ← 변경됨
+              strokeWeight: 6,
               strokeColor: course.color,
               strokeOpacity: 0.8,
               strokeStyle: 'solid'
             });
             polyline.setMap(map);
 
-            // ✅ 클릭 판정용 폴리라인: 두께 40으로 증가
             const hitLine = new kakao.maps.Polyline({
               path: path,
-              strokeWeight: 40, // ← 변경됨
+              strokeWeight: 40,
               strokeColor: 'transparent',
               strokeOpacity: 0.01
             });
             hitLine.setMap(map);
 
-            // 클릭 이벤트 연결
             kakao.maps.event.addListener(polyline, 'click', function () {
-              console.log("📌 polyline clicked:", course.name);
               if (window.CourseChannel) {
                 window.CourseChannel.postMessage(course.name);
               }
             });
 
             kakao.maps.event.addListener(hitLine, 'click', function () {
-              console.log("📌 hitLine clicked:", course.name);
               if (window.CourseChannel) {
                 window.CourseChannel.postMessage(course.name);
               }
