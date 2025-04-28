@@ -8,15 +8,12 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      font-family: 'Arial', sans-serif;
-      background: #f0f0f0;
     }
 
     #map {
       width: 100%;
       height: 100%;
       position: relative;
-      display: none; /* 처음에는 숨김 */
     }
 
     #button-container {
@@ -30,56 +27,23 @@
     }
 
     .map-button {
-      padding: 14px 24px;
-      font-size: 17px;
-      font-weight: 600;
+      padding: 12px 20px;
+      font-size: 18px;
+      font-weight: bold;
       border: none;
-      border-radius: 12px;
-      background-color: #ffffffcc;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
+      border-radius: 10px;
+      background-color: #ffffffee;
+      box-shadow: 0px 3px 6px rgba(0,0,0,0.3);
       cursor: pointer;
-      min-width: 190px;
-      transition: background-color 0.3s, transform 0.2s;
+      min-width: 180px;
     }
 
     .map-button:hover {
-      background-color: #f9f9f9;
-      transform: translateY(-2px);
-    }
-
-    #loading-spinner {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: white;
-      font-size: 24px;
-      font-weight: bold;
-      color: #555;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg);}
-      100% { transform: rotate(360deg);}
-    }
-
-    .spinner {
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #3498db;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
+      background-color: #f0f0f0;
     }
   </style>
 </head>
 <body>
-
-<div id="loading-spinner">
-  <div class="spinner"></div>
-</div>
-
 <div id="map">
   <div id="button-container">
     <button class="map-button" onclick="moveToUser()">📍 내 위치 보기</button>
@@ -92,13 +56,17 @@
   script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=8d8465643b5de1002ccbe7b3197fd029&autoload=false";
   script.onload = function () {
     kakao.maps.load(function () {
+      const defaultCenter = new kakao.maps.LatLng(37.5878, 127.0040);
       const container = document.getElementById('map');
-      const map = new kakao.maps.Map(container, { level: 5 });
+      const map = new kakao.maps.Map(container, {
+        center: defaultCenter,
+        level: 5
+      });
+
       let userMarker = null;
       let userLatLng = null;
-      const bounds = new kakao.maps.LatLngBounds();
-      let courseLoadCount = 0; // 코스 개수 세기
 
+      // 위치는 불러오되 자동으로 이동하지 않음
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
           const lat = position.coords.latitude;
@@ -141,14 +109,14 @@
             )
           });
 
-          map.panTo(userLatLng);
+          map.setCenter(userLatLng);
         } else {
           alert("현재 위치 정보가 없습니다.");
         }
       };
 
       window.moveToDefault = function () {
-        map.panToBounds(bounds);
+        map.setCenter(defaultCenter);
       };
 
       const courses = [
@@ -217,22 +185,11 @@
               yAnchor: 1
             });
             overlay.setMap(map);
-
-            path.forEach(latlng => bounds.extend(latlng));
-
-            courseLoadCount++;
-            if (courseLoadCount === courses.length) {
-              // 모든 코스 다 불러오면 지도 보여주기
-              document.getElementById('loading-spinner').style.display = 'none';
-              document.getElementById('map').style.display = 'block';
-              map.setBounds(bounds);
-            }
           });
       });
     });
   };
   document.head.appendChild(script);
 </script>
-
 </body>
 </html>
