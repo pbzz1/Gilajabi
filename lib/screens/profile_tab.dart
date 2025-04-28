@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../login.dart';
 import 'package:gilajabi/board/liked_posts_page.dart';
 import 'package:gilajabi/board/my_posts_page.dart';
+import 'package:gilajabi/mypage/my_stamps_page.dart'; // ✅ 추가
 
 class ProfileTab extends StatefulWidget {
   const ProfileTab({super.key});
@@ -55,65 +56,68 @@ class _ProfileTabState extends State<ProfileTab> {
             child: const Text('취소'),
           ),
           TextButton(
-  onPressed: () async {
-    final newNickname = _controller.text.trim();
-    if (newNickname.isNotEmpty && userId != null) {
-      // 닉네임 업데이트
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .update({'nickname': newNickname});
+            onPressed: () async {
+              final newNickname = _controller.text.trim();
+              if (newNickname.isNotEmpty && userId != null) {
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(userId)
+                    .update({'nickname': newNickname});
 
-      setState(() {
-        nickname = newNickname;
-      });
+                setState(() {
+                  nickname = newNickname;
+                });
 
-      // 게시글의 작성자 이름 변경
-      final allPosts = await FirebaseFirestore.instance.collection('posts').get();
-      for (final postDoc in allPosts.docs) {
-        final postRef = postDoc.reference;
-        // 게시글 작성자 닉네임 수정
-        if (postDoc.data()['authorId'] == userId) {
-          await postRef.update({'authorNickname': newNickname});
-        }
+                final allPosts = await FirebaseFirestore.instance.collection('posts').get();
+                for (final postDoc in allPosts.docs) {
+                  final postRef = postDoc.reference;
+                  if (postDoc.data()['authorId'] == userId) {
+                    await postRef.update({'authorNickname': newNickname});
+                  }
 
-  // 댓글 중 내 댓글의 닉네임 수정
-  final commentsSnapshot = await postRef.collection('comments').get();
-  for (final commentDoc in commentsSnapshot.docs) {
-    if (commentDoc.data()['authorId'] == userId) {
-      await commentDoc.reference.update({'authorNickname': newNickname});
-    }
-  }
-}
+                  final commentsSnapshot = await postRef.collection('comments').get();
+                  for (final commentDoc in commentsSnapshot.docs) {
+                    if (commentDoc.data()['authorId'] == userId) {
+                      await commentDoc.reference.update({'authorNickname': newNickname});
+                    }
+                  }
+                }
 
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('닉네임이 "$newNickname"(으)로 변경됨')),
-      );
-    }
-  },
-  child: const Text('저장'),
-),
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('닉네임이 "$newNickname"(으)로 변경됨')),
+                );
+              }
+            },
+            child: const Text('저장'),
+          ),
         ],
       ),
     );
   }
 
   void _onMyPostsPressed() {
-  if (userId == null) return;
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => MyPostsPage(userId: userId!)),
-  );
-}
+    if (userId == null) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => MyPostsPage(userId: userId!)),
+    );
+  }
 
   void _onLikedPostsPressed() {
-  if (userId == null) return;
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => LikedPostsPage(userId: userId!)),
-  );
-}
+    if (userId == null) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => LikedPostsPage(userId: userId!)),
+    );
+  }
+
+  void _onMyStampsPressed() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const MyStampsPage()),
+    );
+  }
 
   void _logout() async {
     try {
@@ -173,6 +177,11 @@ class _ProfileTabState extends State<ProfileTab> {
             leading: const Icon(Icons.favorite_border),
             title: const Text('좋아요한 글'),
             onTap: _onLikedPostsPressed,
+          ),
+          ListTile(
+            leading: const Icon(Icons.map_outlined),
+            title: const Text('내 스탬프 보기'),
+            onTap: _onMyStampsPressed,
           ),
 
           const Divider(height: 40),
