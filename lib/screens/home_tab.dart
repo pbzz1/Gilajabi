@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:gilajabi/screens/profile_tab.dart';
 import '../course/course_page.dart';
 import '../board/board_page.dart';
+import 'package:gilajabi/screens/info_page.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // 추가
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -194,7 +195,9 @@ class _HomeTabState extends State<HomeTab> {
                 }),
                 buildMenuButton(Icons.settings, '설정'),
                 buildMenuButton(Icons.notifications, '알림'),
-                buildMenuButton(Icons.info, '정보'),
+                buildMenuButton(Icons.info, '정보', onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const InfoPage()));
+                }),
               ],
             ),
           ),
