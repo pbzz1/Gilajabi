@@ -81,7 +81,7 @@ class LoginPage extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset('images/kakao_login_large_wide.png', height: 30),
+                  Image.asset('assets/images/kakao_login_large_wide.png', height: 30),
                   const SizedBox(width: 10),
                 ],
               ),
