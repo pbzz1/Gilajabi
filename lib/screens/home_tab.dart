@@ -5,6 +5,7 @@ import '../course/course_page.dart';
 import '../board/board_page.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // 추가
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -19,8 +20,8 @@ class _HomeTabState extends State<HomeTab> {
   late Timer _timer;
 
   Stream<StepCount>? _stepCountStream;
-  int _steps = 0;
-  int _baseSteps = 0; // 초기화 기준 걸음 수
+  int _steps = 0; // 화면에 표시할 걸음 수
+  int _baseDeviceSteps = 0; // 디바이스 누적 기준값
 
   final List<String> _bannerImages = [
     'assets/images/homeBanner0.png',
@@ -32,6 +33,7 @@ class _HomeTabState extends State<HomeTab> {
   @override
   void initState() {
     super.initState();
+    _loadBaseDeviceSteps();
     _requestActivityPermission();
     _startListening();
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
@@ -51,12 +53,17 @@ class _HomeTabState extends State<HomeTab> {
     }
   }
 
+  Future<void> _loadBaseDeviceSteps() async {
+    final prefs = await SharedPreferences.getInstance();
+    _baseDeviceSteps = prefs.getInt('baseDeviceSteps') ?? 0;
+  }
+
   void _startListening() {
     _stepCountStream = Pedometer.stepCountStream;
     _stepCountStream?.listen((StepCount event) {
       setState(() {
-        _steps = event.steps - _baseSteps;
-        if (_steps < 0) _steps = 0; // 혹시 모를 음수 방지
+        _steps = event.steps - _baseDeviceSteps;
+        if (_steps < 0) _steps = 0;
       });
     }).onError((error) {
       print('만보기 오류: $error');
@@ -86,9 +93,12 @@ class _HomeTabState extends State<HomeTab> {
     );
   }
 
-  void _resetSteps() {
+  void _resetSteps() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastDeviceSteps = _steps + _baseDeviceSteps;
+    await prefs.setInt('baseDeviceSteps', lastDeviceSteps);
     setState(() {
-      _baseSteps += _steps;
+      _baseDeviceSteps = lastDeviceSteps;
       _steps = 0;
     });
   }
