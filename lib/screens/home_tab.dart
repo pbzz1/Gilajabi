@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gilajabi/screens/profile_tab.dart';
-import '../course/course_page.dart'; // 코스 선택 페이지 import (상대 경로)
-import '../board/board_page.dart'; // 게시판 페이지 import
+import '../course/course_page.dart';
+import '../board/board_page.dart';
+import 'package:pedometer/pedometer.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -15,6 +16,10 @@ class _HomeTabState extends State<HomeTab> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   late Timer _timer;
+  
+  // 만보기 관련 변수
+  Stream<StepCount>? _stepCountStream;
+  int _steps = 0;
 
   final List<String> _bannerImages = [
     'assets/images/homeBanner0.png',
@@ -26,6 +31,7 @@ class _HomeTabState extends State<HomeTab> {
   @override
   void initState() {
     super.initState();
+    // 배너 슬라이드 타이머
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       _currentPage = (_currentPage + 1) % _bannerImages.length;
       _pageController.animateToPage(
@@ -34,7 +40,21 @@ class _HomeTabState extends State<HomeTab> {
         curve: Curves.easeInOut,
       );
     });
+    // 만보기 시작
+    _startListening();
   }
+
+  void _startListening() {
+  _stepCountStream = Pedometer.stepCountStream;
+  _stepCountStream?.listen((StepCount event) {
+    print('걸음 수 이벤트: ${event.steps}'); // ← 이거 추가
+    setState(() {
+      _steps = event.steps;
+    });
+  }).onError((error) {
+    print('만보기 오류: $error');
+  });
+}
 
   @override
   void dispose() {
@@ -76,7 +96,7 @@ class _HomeTabState extends State<HomeTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: ListView(
         children: [
           // 🖼 배너
           SizedBox(
@@ -110,48 +130,49 @@ class _HomeTabState extends State<HomeTab> {
 
           const SizedBox(height: 20),
 
-          // 🎯 메뉴 버튼들 (게시물 버튼에 onTap 추가됨)
+          // 🎯 메뉴 버튼
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Wrap(
               alignment: WrapAlignment.center,
               children: [
-                buildMenuButton(
-                  Icons.map,
-                  '코스 선택',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const CoursePage()),
-                    );
-                  },
-                ),
-                buildMenuButton(
-                  Icons.post_add,
-                  '게시물',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const BoardPage()),
-                    );
-                  },
-                ),
-                buildMenuButton(
-                  Icons.person,
-                  '프로필',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const ProfileTab()),
-                    );
-                  },
-                ),
+                buildMenuButton(Icons.map, '코스 선택', onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const CoursePage()));
+                }),
+                buildMenuButton(Icons.post_add, '게시물', onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const BoardPage()));
+                }),
+                buildMenuButton(Icons.person, '프로필', onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileTab()));
+                }),
                 buildMenuButton(Icons.settings, '설정'),
                 buildMenuButton(Icons.notifications, '알림'),
                 buildMenuButton(Icons.info, '정보'),
               ],
             ),
           ),
+
+          const SizedBox(height: 20),
+
+          // 🏃 걸음 수 카드
+          Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.directions_walk, size: 30, color: Colors.blueAccent),
+                  const SizedBox(width: 12),
+                  Text('걸음 수: $_steps', style: const TextStyle(fontSize: 20)),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
         ],
       ),
     );
