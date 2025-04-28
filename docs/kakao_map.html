@@ -8,6 +8,8 @@
       margin: 0;
       padding: 0;
       height: 100%;
+      font-family: 'Arial', sans-serif;
+      background: #f0f0f0;
     }
 
     #map {
@@ -27,23 +29,26 @@
     }
 
     .map-button {
-      padding: 12px 20px;
-      font-size: 18px;
-      font-weight: bold;
+      padding: 14px 24px;
+      font-size: 17px;
+      font-weight: 600;
       border: none;
-      border-radius: 10px;
-      background-color: #ffffffee;
-      box-shadow: 0px 3px 6px rgba(0,0,0,0.3);
+      border-radius: 12px;
+      background-color: #ffffffcc;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
       cursor: pointer;
-      min-width: 180px;
+      min-width: 190px;
+      transition: background-color 0.3s, transform 0.2s;
     }
 
     .map-button:hover {
-      background-color: #f0f0f0;
+      background-color: #f9f9f9;
+      transform: translateY(-2px);
     }
   </style>
 </head>
 <body>
+
 <div id="map">
   <div id="button-container">
     <button class="map-button" onclick="moveToUser()">📍 내 위치 보기</button>
@@ -56,17 +61,12 @@
   script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=8d8465643b5de1002ccbe7b3197fd029&autoload=false";
   script.onload = function () {
     kakao.maps.load(function () {
-      const defaultCenter = new kakao.maps.LatLng(37.5878, 127.0040);
       const container = document.getElementById('map');
-      const map = new kakao.maps.Map(container, {
-        center: defaultCenter,
-        level: 5
-      });
-
+      const map = new kakao.maps.Map(container, { level: 5 });
       let userMarker = null;
       let userLatLng = null;
+      const bounds = new kakao.maps.LatLngBounds();
 
-      // 위치는 불러오되 자동으로 이동하지 않음
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
           const lat = position.coords.latitude;
@@ -109,14 +109,14 @@
             )
           });
 
-          map.setCenter(userLatLng);
+          map.panTo(userLatLng);
         } else {
           alert("현재 위치 정보가 없습니다.");
         }
       };
 
       window.moveToDefault = function () {
-        map.setCenter(defaultCenter);
+        map.panToBounds(bounds);
       };
 
       const courses = [
@@ -132,6 +132,11 @@
         fetch(`assets/json/${course.name}_path.json`)
           .then(res => res.json())
           .then(data => {
+            if (!data || data.length === 0) {
+              console.warn(`경로 데이터 없음: ${course.name}`);
+              return;
+            }
+
             const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
 
             const polyline = new kakao.maps.Polyline({
@@ -165,6 +170,8 @@
 
             const midIndex = Math.floor(path.length / 2);
             const labelPos = path[midIndex];
+            if (!labelPos) return;
+
             const labelHTML = `
               <div onclick="window.CourseChannel?.postMessage('${course.name}')"
                    style="
@@ -185,11 +192,18 @@
               yAnchor: 1
             });
             overlay.setMap(map);
+
+            path.forEach(latlng => bounds.extend(latlng));
+            map.setBounds(bounds);
+          })
+          .catch(error => {
+            console.error(`코스 로드 실패: ${course.name}`, error);
           });
       });
     });
   };
   document.head.appendChild(script);
 </script>
+
 </body>
 </html>
