@@ -4,6 +4,7 @@ import 'package:gilajabi/screens/profile_tab.dart';
 import '../course/course_page.dart';
 import '../board/board_page.dart';
 import 'package:pedometer/pedometer.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -16,10 +17,10 @@ class _HomeTabState extends State<HomeTab> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   late Timer _timer;
-  
-  // 만보기 관련 변수
+
   Stream<StepCount>? _stepCountStream;
   int _steps = 0;
+  int _baseSteps = 0; // 초기화 기준 걸음 수
 
   final List<String> _bannerImages = [
     'assets/images/homeBanner0.png',
@@ -31,7 +32,8 @@ class _HomeTabState extends State<HomeTab> {
   @override
   void initState() {
     super.initState();
-    // 배너 슬라이드 타이머
+    _requestActivityPermission();
+    _startListening();
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       _currentPage = (_currentPage + 1) % _bannerImages.length;
       _pageController.animateToPage(
@@ -40,21 +42,56 @@ class _HomeTabState extends State<HomeTab> {
         curve: Curves.easeInOut,
       );
     });
-    // 만보기 시작
-    _startListening();
+  }
+
+  Future<void> _requestActivityPermission() async {
+    var status = await Permission.activityRecognition.status;
+    if (!status.isGranted) {
+      await Permission.activityRecognition.request();
+    }
   }
 
   void _startListening() {
-  _stepCountStream = Pedometer.stepCountStream;
-  _stepCountStream?.listen((StepCount event) {
-    print('걸음 수 이벤트: ${event.steps}'); // ← 이거 추가
-    setState(() {
-      _steps = event.steps;
+    _stepCountStream = Pedometer.stepCountStream;
+    _stepCountStream?.listen((StepCount event) {
+      setState(() {
+        _steps = event.steps - _baseSteps;
+        if (_steps < 0) _steps = 0; // 혹시 모를 음수 방지
+      });
+    }).onError((error) {
+      print('만보기 오류: $error');
     });
-  }).onError((error) {
-    print('만보기 오류: $error');
-  });
-}
+  }
+
+  void _showResetConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('걸음 수 초기화'),
+        content: const Text('걸음 수를 초기화하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              _resetSteps();
+              Navigator.pop(context);
+            },
+            child: const Text('초기화'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _resetSteps() {
+    setState(() {
+      _baseSteps += _steps;
+      _steps = 0;
+    });
+  }
 
   @override
   void dispose() {
@@ -98,7 +135,7 @@ class _HomeTabState extends State<HomeTab> {
     return Scaffold(
       body: ListView(
         children: [
-          // 🖼 배너
+          // 배너
           SizedBox(
             height: 200,
             child: PageView.builder(
@@ -130,7 +167,7 @@ class _HomeTabState extends State<HomeTab> {
 
           const SizedBox(height: 20),
 
-          // 🎯 메뉴 버튼
+          // 메뉴 버튼
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Wrap(
@@ -154,19 +191,37 @@ class _HomeTabState extends State<HomeTab> {
 
           const SizedBox(height: 20),
 
-          // 🏃 걸음 수 카드
+          // 걸음 수 카드
           Card(
             margin: const EdgeInsets.symmetric(horizontal: 16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 4,
             child: Padding(
               padding: const EdgeInsets.all(20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Column(
                 children: [
-                  const Icon(Icons.directions_walk, size: 30, color: Colors.blueAccent),
-                  const SizedBox(width: 12),
-                  Text('걸음 수: $_steps', style: const TextStyle(fontSize: 20)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.directions_walk, size: 30, color: Colors.blueAccent),
+                      const SizedBox(width: 12),
+                      Text('걸음 수: $_steps', style: const TextStyle(fontSize: 20)),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: _showResetConfirmationDialog,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('초기화'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                    ),
+                  ),
                 ],
               ),
             ),
