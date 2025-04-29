@@ -31,7 +31,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('길라잡이'),
+        title: Padding(
+       padding: const EdgeInsets.symmetric(vertical: 8.0), // 위아래 8픽셀 여백
+          child: Image.asset(
+            'assets/images/Gilajabi_logo.png',
+            height: 40,
+          ),
+        ),
       ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
