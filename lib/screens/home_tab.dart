@@ -147,6 +147,8 @@ class _HomeTabState extends State<HomeTab> {
     return Scaffold(
       body: ListView(
         children: [
+          const SizedBox(height: 16), // 👈 여기가 상단 여백!
+
           // 배너
           SizedBox(
             height: 200,
