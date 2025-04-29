@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>코스 추적 지도</title>
+    <style>
+        html, body, #map {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+        #button-container {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          z-index: 10;
+        }
+        .map-button {
+          padding: 10px 16px;
+          margin-bottom: 8px;
+          background-color: white;
+          border-radius: 6px;
+          border: 1px solid #ccc;
+          font-weight: bold;
+          cursor: pointer;
+        }
+    </style>
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=8d8465643b5de1002ccbe7b3197fd029&autoload=false"></script>
+</head>
+<body>
+<div id="map">
+    <div id="button-container">
+        <button class="map-button" onclick="moveToUser()">📍 내 위치 보기</button>
+    </div>
+</div>
+<script>
+    let map = null;
+    let userMarker = null;
+    let userLatLng = null;
+    window.flutter_ready = false;
+
+    kakao.maps.load(function () {
+      const container = document.getElementById('map');
+      const center = new kakao.maps.LatLng(37.5665, 126.9780);
+      map = new kakao.maps.Map(container, {
+        center: center,
+        level: 5
+      });
+
+      // 위치 정보 불러오기 (자동 이동 없음)
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          userLatLng = new kakao.maps.LatLng(lat, lng);
+        }, function (error) {
+          console.error("위치 정보를 가져오는 데 실패했습니다.", error);
+        });
+      }
+
+      window.flutter_ready = true;
+    });
+
+    function drawPolyline(pathPoints) {
+      if (!window.flutter_ready || !map) return;
+      const latlngs = pathPoints.map(p => new kakao.maps.LatLng(p.lat, p.lng));
+      const polyline = new kakao.maps.Polyline({
+        path: latlngs,
+        strokeWeight: 6,
+        strokeColor: '#FF6600',
+        strokeOpacity: 0.8,
+        strokeStyle: 'solid'
+      });
+      polyline.setMap(map);
+      map.setCenter(latlngs[0]);
+    }
+
+    function addStampMarkers(stamps) {
+      if (!window.flutter_ready || !map) return;
+      stamps.forEach(stamp => {
+        new kakao.maps.Marker({
+          position: new kakao.maps.LatLng(stamp.lat, stamp.lng),
+          map: map,
+          title: stamp.name
+        });
+      });
+    }
+
+    function updateUserLocation(lat, lng) {
+      if (!window.flutter_ready || !map) return;
+      const position = new kakao.maps.LatLng(lat, lng);
+      if (userMarker) userMarker.setMap(null);
+      userMarker = new kakao.maps.Marker({
+        position: position,
+        map: map,
+        title: '현재 위치',
+        image: new kakao.maps.MarkerImage(
+          "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+          new kakao.maps.Size(24, 35)
+        )
+      });
+    }
+
+    function moveToUser() {
+      if (!userLatLng || !map) {
+        alert("위치 정보를 불러오지 못했습니다.");
+        return;
+      }
+      if (userMarker) userMarker.setMap(null);
+      userMarker = new kakao.maps.Marker({
+        position: userLatLng,
+        map: map,
+        title: '현재 위치',
+        image: new kakao.maps.MarkerImage(
+          "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+          new kakao.maps.Size(24, 35)
+        )
+      });
+      map.setCenter(userLatLng);
+    }
+</script>
+</body>
+</html>

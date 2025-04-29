@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // ✅ 추가
+import 'package:provider/provider.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../login.dart';
 import 'package:gilajabi/board/liked_posts_page.dart';
 import 'package:gilajabi/board/my_posts_page.dart';
-import '../providers/app_settings_provider.dart'; // ✅ 추가
+import '../providers/app_settings_provider.dart';
+import 'package:gilajabi/mypage/my_stamps_page.dart';
 
 class ProfileTab extends StatefulWidget {
   const ProfileTab({super.key}); // ✅ isKoreanMode 삭제
@@ -76,7 +77,22 @@ class _ProfileTabState extends State<ProfileTab> {
                 setState(() {
                   nickname = newNickname;
                 });
-              }
+
+                final allPosts = await FirebaseFirestore.instance.collection('posts').get();
+                for (final postDoc in allPosts.docs) {
+                  final postRef = postDoc.reference;
+                  if (postDoc.data()['authorId'] == userId) {
+                    await postRef.update({'authorNickname': newNickname});
+                  }
+
+                  final commentsSnapshot = await postRef.collection('comments').get();
+                  for (final commentDoc in commentsSnapshot.docs) {
+                    if (commentDoc.data()['authorId'] == userId) {
+                      await commentDoc.reference.update({'authorNickname': newNickname});
+                    }
+                  }
+                }
+                
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(isKoreanMode 
@@ -104,6 +120,13 @@ class _ProfileTabState extends State<ProfileTab> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => LikedPostsPage(userId: userId!)),
+    );
+  }
+
+  void _onMyStampsPressed() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const MyStampsPage()),
     );
   }
 
@@ -168,6 +191,11 @@ class _ProfileTabState extends State<ProfileTab> {
             leading: const Icon(Icons.favorite_border),
             title: Text(isKoreanMode ? '좋아요한 글' : 'Liked Posts'),
             onTap: _onLikedPostsPressed,
+          ),
+          ListTile(
+            leading: const Icon(Icons.map_outlined),
+            title: const Text('내 스탬프 보기'),
+            onTap: _onMyStampsPressed,
           ),
           const Divider(height: 40),
           Center(

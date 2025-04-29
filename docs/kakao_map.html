@@ -23,19 +23,19 @@
       z-index: 10;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 18px; /* 버튼 간 간격도 약간 키움 */
     }
 
     .map-button {
-      padding: 12px 20px;
-      font-size: 18px;
+      padding: 18px 30px;        /* 1.5배 확대 */
+      font-size: 27px;           /* 1.5배 확대 */
+      min-width: 270px;          /* 1.5배 확대 */
       font-weight: bold;
       border: none;
       border-radius: 10px;
       background-color: #ffffffee;
       box-shadow: 0px 3px 6px rgba(0,0,0,0.3);
       cursor: pointer;
-      min-width: 180px;
     }
 
     .map-button:hover {
@@ -44,6 +44,7 @@
   </style>
 </head>
 <body>
+
 <div id="map">
   <div id="button-container">
     <button class="map-button" onclick="moveToUser()">📍 내 위치 보기</button>
@@ -60,23 +61,24 @@
       const container = document.getElementById('map');
       const map = new kakao.maps.Map(container, {
         center: defaultCenter,
-        level: 5
+        level: 4
       });
+
+      let userMarker = null;
+      let userLatLng = null;
+      const bounds = new kakao.maps.LatLngBounds();
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          setUserLocation(lat, lng);
+          userLatLng = new kakao.maps.LatLng(lat, lng);
         }, function (error) {
           console.error("위치 정보를 가져오는 데 실패했습니다.", error);
         });
       } else {
         alert("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
       }
-
-      let userMarker = null;
-      let userLatLng = null;
 
       window.setUserLocation = function(lat, lng) {
         userLatLng = new kakao.maps.LatLng(lat, lng);
@@ -92,20 +94,30 @@
             new kakao.maps.Size(40, 40)
           )
         });
-
-        map.setCenter(userLatLng);
       };
 
       window.moveToUser = function () {
         if (userLatLng) {
-          map.setCenter(userLatLng);
+          if (userMarker) userMarker.setMap(null);
+
+          userMarker = new kakao.maps.Marker({
+            position: userLatLng,
+            map: map,
+            title: '현재 위치',
+            image: new kakao.maps.MarkerImage(
+              'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+              new kakao.maps.Size(40, 40)
+            )
+          });
+
+          map.panTo(userLatLng);
         } else {
           alert("현재 위치 정보가 없습니다.");
         }
       };
 
       window.moveToDefault = function () {
-        map.setCenter(defaultCenter);
+        map.panTo(bounds);
       };
 
       const courses = [
@@ -121,37 +133,34 @@
         fetch(`assets/json/${course.name}_path.json`)
           .then(res => res.json())
           .then(data => {
+            if (!data || data.length === 0) return;
+
             const path = data.map(c => new kakao.maps.LatLng(c[0], c[1]));
 
-            // ⚡ 더 굵게 변경된 시각용 폴리라인
             const polyline = new kakao.maps.Polyline({
               path: path,
-              strokeWeight: 6, // ← 변경됨
+              strokeWeight: 6,
               strokeColor: course.color,
               strokeOpacity: 0.8,
               strokeStyle: 'solid'
             });
             polyline.setMap(map);
 
-            // ✅ 클릭 판정용 폴리라인: 두께 40으로 증가
             const hitLine = new kakao.maps.Polyline({
               path: path,
-              strokeWeight: 40, // ← 변경됨
+              strokeWeight: 40,
               strokeColor: 'transparent',
               strokeOpacity: 0.01
             });
             hitLine.setMap(map);
 
-            // 클릭 이벤트 연결
             kakao.maps.event.addListener(polyline, 'click', function () {
-              console.log("📌 polyline clicked:", course.name);
               if (window.CourseChannel) {
                 window.CourseChannel.postMessage(course.name);
               }
             });
 
             kakao.maps.event.addListener(hitLine, 'click', function () {
-              console.log("📌 hitLine clicked:", course.name);
               if (window.CourseChannel) {
                 window.CourseChannel.postMessage(course.name);
               }
@@ -159,6 +168,8 @@
 
             const midIndex = Math.floor(path.length / 2);
             const labelPos = path[midIndex];
+            if (!labelPos) return;
+
             const labelHTML = `
               <div onclick="window.CourseChannel?.postMessage('${course.name}')"
                    style="
@@ -179,11 +190,15 @@
               yAnchor: 1
             });
             overlay.setMap(map);
+
+            path.forEach(latlng => bounds.extend(latlng));
+            map.setBounds(bounds);
           });
       });
     });
   };
   document.head.appendChild(script);
 </script>
+
 </body>
 </html>

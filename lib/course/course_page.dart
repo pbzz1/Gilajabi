@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
-import 'baegak_info_page.dart';
-import 'naksan_info_page.dart';
-import 'heunginjimun_info_page.dart';
-import 'namsan_info_page.dart';
-import 'sungnyemun_info_page.dart';
-import 'inwangsan_info_page.dart';
+import 'info/baegak_info_page.dart';
+import 'info/naksan_info_page.dart';
+import 'info/heunginjimun_info_page.dart';
+import 'info/namsan_info_page.dart';
+import 'info/sungnyemun_info_page.dart';
+import 'info/inwangsan_info_page.dart';
 
 class CoursePage extends StatefulWidget {
   const CoursePage({super.key});
