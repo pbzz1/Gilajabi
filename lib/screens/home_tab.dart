@@ -7,6 +7,7 @@ import 'package:gilajabi/screens/info_page.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gilajabi/screens/memo_page.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -194,7 +195,9 @@ class _HomeTabState extends State<HomeTab> {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileTab()));
                 }),
                 buildMenuButton(Icons.settings, '설정'),
-                buildMenuButton(Icons.notifications, '알림'),
+                buildMenuButton(Icons.edit_note, '메모장', onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const MemoPage()));
+                }),
                 buildMenuButton(Icons.info, '정보', onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const InfoPage()));
                 }),
