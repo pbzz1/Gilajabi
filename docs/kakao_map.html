@@ -117,8 +117,8 @@
       };
 
       window.moveToDefault = function () {
-	map.panTo(bounds);
-        map.setBounds(bounds);  // 👈 모든 코스 경계를 보여줌
+	const center = bounds.getCenter();
+        map.panTo(center);
       };
 
       const courses = [
