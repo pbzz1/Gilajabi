@@ -1,23 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // ✅ 추가
 import 'package:gilajabi/screens/profile_tab.dart';
 import '../course/course_page.dart';
 import '../board/board_page.dart';
 import '../screens/settings_page.dart';
+import '../providers/app_settings_provider.dart'; // ✅ 추가
 
 class HomeTab extends StatefulWidget {
-  final Function(bool) onToggleDarkMode;
-  final bool isDarkMode;
-  final Function(bool) onToggleKoreanMode;
-  final bool isKoreanMode;
-
-  const HomeTab({
-    super.key,
-    required this.onToggleDarkMode,
-    required this.isDarkMode,
-    required this.onToggleKoreanMode,
-    required this.isKoreanMode,
-  });
+  const HomeTab({super.key});
 
   @override
   State<HomeTab> createState() => _HomeTabState();
@@ -87,6 +78,9 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<AppSettingsProvider>(context); // ✅ Provider로 상태 가져오기
+    final isKoreanMode = settings.isKoreanMode;
+
     return Scaffold(
       body: Column(
         children: [
@@ -130,7 +124,7 @@ class _HomeTabState extends State<HomeTab> {
               children: [
                 buildMenuButton(
                   Icons.map,
-                  widget.isKoreanMode ? '코스 선택' : 'Course',
+                  isKoreanMode ? '코스 선택' : 'Course',
                   onTap: () {
                     Navigator.push(
                       context,
@@ -140,37 +134,32 @@ class _HomeTabState extends State<HomeTab> {
                 ),
                 buildMenuButton(
                   Icons.post_add,
-                  widget.isKoreanMode ? '게시물' : 'Board',
+                  isKoreanMode ? '게시물' : 'Board',
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => BoardPage(isKoreanMode: widget.isKoreanMode)),
+                      MaterialPageRoute(builder: (_) => const BoardPage()),
                     );
                   },
                 ),
                 buildMenuButton(
                   Icons.person,
-                  widget.isKoreanMode ? '프로필' : 'Profile',
+                  isKoreanMode ? '프로필' : 'Profile',
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => ProfileTab(isKoreanMode: widget.isKoreanMode)),
+                      MaterialPageRoute(builder: (_) => const ProfileTab()),
                     );
                   },
                 ),
                 buildMenuButton(
                   Icons.settings,
-                  widget.isKoreanMode ? '설정' : 'Settings',
+                  isKoreanMode ? '설정' : 'Settings',
                   onTap: () async {
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => SettingsPage(
-                          onToggleDarkMode: widget.onToggleDarkMode,
-                          isDarkMode: widget.isDarkMode,
-                          onToggleKoreanMode: widget.onToggleKoreanMode,
-                          isKoreanMode: widget.isKoreanMode,
-                        ),
+                        builder: (_) => const SettingsPage(), // ✅ 바로 const SettingsPage
                       ),
                     );
                     if (result == true) {
@@ -180,11 +169,11 @@ class _HomeTabState extends State<HomeTab> {
                 ),
                 buildMenuButton(
                   Icons.notifications,
-                  widget.isKoreanMode ? '알림' : 'Notification',
+                  isKoreanMode ? '알림' : 'Notification',
                 ),
                 buildMenuButton(
                   Icons.info,
-                  widget.isKoreanMode ? '정보' : 'Info',
+                  isKoreanMode ? '정보' : 'Info',
                 ),
               ],
             ),

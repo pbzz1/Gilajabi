@@ -5,18 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'myhomepage.dart';
 
 class LoginPage extends StatelessWidget {
-  final void Function(bool)? onToggleDarkMode;
-  final bool? isDarkMode;
-  final void Function(bool)? onToggleKoreanMode; // ✅ 추가
-  final bool? isKoreanMode;                      // ✅ 추가
-
-  const LoginPage({
-    Key? key,
-    this.onToggleDarkMode,
-    this.isDarkMode,
-    this.onToggleKoreanMode, // ✅
-    this.isKoreanMode,        // ✅
-  }) : super(key: key);
+  const LoginPage({Key? key}) : super(key: key); // ✅ 생성자 파라미터 다 삭제!
 
   Future<void> signInWithKakao(BuildContext context) async {
     try {
@@ -53,12 +42,7 @@ class LoginPage extends StatelessWidget {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => MyHomePage(
-              onToggleDarkMode: onToggleDarkMode ?? (bool _) {},
-              isDarkMode: isDarkMode ?? false,
-              onToggleKoreanMode: onToggleKoreanMode ?? (bool _) {}, // ✅
-              isKoreanMode: isKoreanMode ?? true,                   // ✅
-            ),
+            builder: (context) => const MyHomePage(), // ✅ 여기 깔끔하게 수정
           ),
         );
       }

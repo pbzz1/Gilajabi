@@ -1,54 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // ✅ 추가
+import '../providers/app_settings_provider.dart'; // ✅ 추가
 
-class SettingsPage extends StatefulWidget {
-  final Function(bool) onToggleDarkMode;
-  final bool isDarkMode;
-  final Function(bool) onToggleKoreanMode;
-  final bool isKoreanMode;
-
-  const SettingsPage({
-    super.key,
-    required this.onToggleDarkMode,
-    required this.isDarkMode,
-    required this.onToggleKoreanMode,
-    required this.isKoreanMode,
-  });
-
-  @override
-  State<SettingsPage> createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends State<SettingsPage> {
-  late bool currentDarkMode;
-  late bool currentKoreanMode;
-
-  @override
-  void initState() {
-    super.initState();
-    currentDarkMode = widget.isDarkMode;
-    currentKoreanMode = widget.isKoreanMode;
-  }
-
-  @override
-  void didUpdateWidget(covariant SettingsPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.isDarkMode != widget.isDarkMode) {
-      currentDarkMode = widget.isDarkMode;
-    }
-    if (oldWidget.isKoreanMode != widget.isKoreanMode) {
-      currentKoreanMode = widget.isKoreanMode;
-    }
-  }
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key}); // ✅ 파라미터 모두 제거
 
   @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<AppSettingsProvider>(context); // ✅ Provider에서 상태 가져오기
+    final isKoreanMode = settings.isKoreanMode;
+    final isDarkMode = settings.isDarkMode;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(currentKoreanMode ? '설정' : 'Settings'),
+        title: Text(isKoreanMode ? '설정' : 'Settings'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context, true); // ✅ 설정 변경 결과 넘기기
+            Navigator.pop(context, true); // ✅ 설정 변경 결과 넘기기 (필요하면)
           },
         ),
       ),
@@ -57,25 +26,19 @@ class _SettingsPageState extends State<SettingsPage> {
           SwitchListTile(
             secondary: const Icon(Icons.language),
             title: const Text('한영 모드'),
-            subtitle: Text(currentKoreanMode ? '한글 모드' : '영어 모드'),
-            value: currentKoreanMode,
+            subtitle: Text(isKoreanMode ? '한글 모드' : '영어 모드'),
+            value: isKoreanMode,
             onChanged: (bool value) {
-              setState(() {
-                currentKoreanMode = value;
-              });
-              widget.onToggleKoreanMode(value); // ✅ 상위(HomeTab)로 반영
+              settings.toggleKoreanMode(value); // ✅ Provider 메서드 호출
             },
           ),
           SwitchListTile(
             secondary: const Icon(Icons.dark_mode),
             title: const Text('다크 모드'),
-            subtitle: Text(currentDarkMode ? '다크 모드' : '라이트 모드'),
-            value: currentDarkMode,
+            subtitle: Text(isDarkMode ? '다크 모드' : '라이트 모드'),
+            value: isDarkMode,
             onChanged: (bool value) {
-              setState(() {
-                currentDarkMode = value;
-              });
-              widget.onToggleDarkMode(value);
+              settings.toggleDarkMode(value); // ✅ Provider 메서드 호출
             },
           ),
           const Divider(),

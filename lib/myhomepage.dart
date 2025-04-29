@@ -1,21 +1,12 @@
 import 'package:flutter/material.dart';
-import 'screens/home_tab.dart';
-import 'board/board_page.dart';
-import 'screens/profile_tab.dart';
+import 'package:gilajabi/screens/home_tab.dart';
+import 'package:gilajabi/board/board_page.dart';
+import 'package:gilajabi/screens/profile_tab.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_settings_provider.dart'; // ✅ 추가
 
 class MyHomePage extends StatefulWidget {
-  final Function(bool) onToggleDarkMode;
-  final bool isDarkMode;
-  final Function(bool) onToggleKoreanMode;
-  final bool isKoreanMode;
-
-  const MyHomePage({
-    super.key,
-    required this.onToggleDarkMode,
-    required this.isDarkMode,
-    required this.onToggleKoreanMode,
-    required this.isKoreanMode,
-  });
+  const MyHomePage({super.key}); // ✅ 넘겨받는 파라미터 제거
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -28,15 +19,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _screens = [
-      HomeTab(
-        onToggleDarkMode: widget.onToggleDarkMode,
-        isDarkMode: widget.isDarkMode,
-        onToggleKoreanMode: widget.onToggleKoreanMode,  
-        isKoreanMode: widget.isKoreanMode,
-      ),
-      BoardPage(isKoreanMode: widget.isKoreanMode),
-      ProfileTab(isKoreanMode: widget.isKoreanMode),
+    _screens = const [
+      HomeTab(),
+      BoardPage(),
+      ProfileTab(),
     ];
   }
 
@@ -48,9 +34,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<AppSettingsProvider>(context); // ✅ Provider로 접근
+    final isKoreanMode = settings.isKoreanMode;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isKoreanMode ? '길라잡이' : 'Gilajabi'), // ✅ 한영 적용
+        title: Text(isKoreanMode ? '길라잡이' : 'Gilajabi'), // ✅ 한영 적용
       ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -60,15 +49,15 @@ class _MyHomePageState extends State<MyHomePage> {
         items: [
           BottomNavigationBarItem(
             icon: const Icon(Icons.home),
-            label: widget.isKoreanMode ? '홈' : 'Home', // ✅ 한영 적용
+            label: isKoreanMode ? '홈' : 'Home', // ✅ 한영 적용
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.post_add),
-            label: widget.isKoreanMode ? '게시물' : 'Posts', // ✅ 한영 적용
+            label: isKoreanMode ? '게시물' : 'Posts', // ✅ 한영 적용
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.person),
-            label: widget.isKoreanMode ? '프로필' : 'Profile', // ✅ 한영 적용
+            label: isKoreanMode ? '프로필' : 'Profile', // ✅ 한영 적용
           ),
         ],
       ),
