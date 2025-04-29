@@ -4,9 +4,19 @@ import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'myhomepage.dart';
 
-
 class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+  final void Function(bool)? onToggleDarkMode;
+  final bool? isDarkMode;
+  final void Function(bool)? onToggleKoreanMode; // ✅ 추가
+  final bool? isKoreanMode;                      // ✅ 추가
+
+  const LoginPage({
+    Key? key,
+    this.onToggleDarkMode,
+    this.isDarkMode,
+    this.onToggleKoreanMode, // ✅
+    this.isKoreanMode,        // ✅
+  }) : super(key: key);
 
   Future<void> signInWithKakao(BuildContext context) async {
     try {
@@ -42,7 +52,14 @@ class LoginPage extends StatelessWidget {
       if (context.mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const MyHomePage()),
+          MaterialPageRoute(
+            builder: (context) => MyHomePage(
+              onToggleDarkMode: onToggleDarkMode ?? (bool _) {},
+              isDarkMode: isDarkMode ?? false,
+              onToggleKoreanMode: onToggleKoreanMode ?? (bool _) {}, // ✅
+              isKoreanMode: isKoreanMode ?? true,                   // ✅
+            ),
+          ),
         );
       }
     } catch (error) {

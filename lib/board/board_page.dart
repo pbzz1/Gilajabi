@@ -7,7 +7,9 @@ import 'dart:io';
 import 'post_detail_page.dart';
 
 class BoardPage extends StatefulWidget {
-  const BoardPage({super.key});
+  final bool isKoreanMode; // ✅ 추가
+
+  const BoardPage({super.key, required this.isKoreanMode});
 
   @override
   State<BoardPage> createState() => _BoardPageState();
@@ -32,7 +34,7 @@ class _BoardPageState extends State<BoardPage> {
       final user = await UserApi.instance.me();
       setState(() {
         userId = user.id.toString();
-        nickname = user.kakaoAccount?.profile?.nickname ?? '알 수 없음';
+        nickname = user.kakaoAccount?.profile?.nickname ?? 'Unknown';
       });
     } catch (e) {
       print('사용자 정보 로딩 실패: $e');
@@ -64,8 +66,8 @@ class _BoardPageState extends State<BoardPage> {
             ? TextField(
                 controller: _searchController,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: '검색어 입력',
+                decoration: InputDecoration(
+                  hintText: widget.isKoreanMode ? '검색어 입력' : 'Search',
                   border: InputBorder.none,
                 ),
                 onChanged: (value) {
@@ -74,7 +76,7 @@ class _BoardPageState extends State<BoardPage> {
                   });
                 },
               )
-            : const Text('게시판'),
+            : Text(widget.isKoreanMode ? '게시판' : 'Board'),
         actions: [
           IconButton(
             icon: Icon(_isSearching ? Icons.close : Icons.search),
@@ -116,7 +118,7 @@ class _BoardPageState extends State<BoardPage> {
               return ListTile(
                 title: Row(
                   children: [
-                    Expanded(child: Text(data['title'] ?? '제목 없음')),
+                    Expanded(child: Text(data['title'] ?? (widget.isKoreanMode ? '제목 없음' : 'No Title'))),
                     if (images.isNotEmpty)
                       const Padding(
                         padding: EdgeInsets.only(left: 4.0),
@@ -160,7 +162,7 @@ class _BoardPageState extends State<BoardPage> {
                     MaterialPageRoute(
                       builder: (context) => PostDetailPage(
                         postId: doc.id,
-                        title: data['title'] ?? '제목 없음',
+                        title: data['title'] ?? (widget.isKoreanMode ? '제목 없음' : 'No Title'),
                         content: data['content'] ?? '',
                         authorNickname: data['authorNickname'] ?? '',
                         createdAt: data['createdAt']?.toDate(),
@@ -185,11 +187,11 @@ class _BoardPageState extends State<BoardPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('삭제 확인'),
-        content: const Text('이 글과 이미지들을 삭제하시겠습니까?'),
+        title: Text(widget.isKoreanMode ? '삭제 확인' : 'Delete Confirmation'),
+        content: Text(widget.isKoreanMode ? '이 글과 이미지들을 삭제하시겠습니까?' : 'Do you want to delete this post and images?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('삭제')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(widget.isKoreanMode ? '취소' : 'Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text(widget.isKoreanMode ? '삭제' : 'Delete')),
         ],
       ),
     );
@@ -216,13 +218,13 @@ class _BoardPageState extends State<BoardPage> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text('글 작성'),
+          title: Text(widget.isKoreanMode ? '글 작성' : 'New Post'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(controller: titleController, decoration: const InputDecoration(labelText: '제목')),
-                TextField(controller: contentController, decoration: const InputDecoration(labelText: '내용')),
+                TextField(controller: titleController, decoration: InputDecoration(labelText: widget.isKoreanMode ? '제목' : 'Title')),
+                TextField(controller: contentController, decoration: InputDecoration(labelText: widget.isKoreanMode ? '내용' : 'Content')),
                 const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: isUploading
@@ -243,7 +245,7 @@ class _BoardPageState extends State<BoardPage> {
                           height: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('이미지 업로드'),
+                      : Text(widget.isKoreanMode ? '이미지 업로드' : 'Upload Images'),
                 ),
                 if (uploadedImageUrls.isNotEmpty)
                   Wrap(
@@ -256,7 +258,7 @@ class _BoardPageState extends State<BoardPage> {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
+            TextButton(onPressed: () => Navigator.pop(context), child: Text(widget.isKoreanMode ? '취소' : 'Cancel')),
             ElevatedButton(
               onPressed: isUploading
                   ? null
@@ -279,7 +281,7 @@ class _BoardPageState extends State<BoardPage> {
                       uploadedImageUrls = [];
                       Navigator.pop(context);
                     },
-              child: const Text('등록'),
+              child: Text(widget.isKoreanMode ? '등록' : 'Submit'),
             ),
           ],
         ),
@@ -294,16 +296,16 @@ class _BoardPageState extends State<BoardPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('글 수정'),
+        title: Text(widget.isKoreanMode ? '글 수정' : 'Edit Post'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: titleController, decoration: const InputDecoration(labelText: '제목')),
-            TextField(controller: contentController, decoration: const InputDecoration(labelText: '내용')),
+            TextField(controller: titleController, decoration: InputDecoration(labelText: widget.isKoreanMode ? '제목' : 'Title')),
+            TextField(controller: contentController, decoration: InputDecoration(labelText: widget.isKoreanMode ? '내용' : 'Content')),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(widget.isKoreanMode ? '취소' : 'Cancel')),
           ElevatedButton(
             onPressed: () async {
               final newTitle = titleController.text;
@@ -317,7 +319,7 @@ class _BoardPageState extends State<BoardPage> {
               }
               Navigator.pop(context);
             },
-            child: const Text('수정'),
+            child: Text(widget.isKoreanMode ? '수정' : 'Update'),
           ),
         ],
       ),

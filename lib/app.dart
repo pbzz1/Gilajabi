@@ -12,6 +12,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _isLoggedIn = false;
+  bool _isDarkMode = false;
+  bool _isKoreanMode = true;
 
   @override
   void initState() {
@@ -26,14 +28,33 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void _toggleDarkMode(bool value) {
+    setState(() {
+      _isDarkMode = value;
+    });
+  }
+
+  void _toggleKoreanMode(bool value) {
+    setState(() {
+      _isKoreanMode = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
-      ),
-      home: _isLoggedIn ? const MyHomePage() : const LoginPage(), // title 제거
+      title: '길라잡이',
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      home: _isLoggedIn
+          ? MyHomePage(
+              onToggleDarkMode: _toggleDarkMode,
+              isDarkMode: _isDarkMode,
+              onToggleKoreanMode: _toggleKoreanMode,
+              isKoreanMode: _isKoreanMode,
+            )
+          : const LoginPage(),
     );
   }
 }

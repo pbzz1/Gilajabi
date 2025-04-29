@@ -1,11 +1,23 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gilajabi/screens/profile_tab.dart';
-import '../course/course_page.dart'; // 코스 선택 페이지 import (상대 경로)
-import '../board/board_page.dart'; // 게시판 페이지 import
+import '../course/course_page.dart';
+import '../board/board_page.dart';
+import '../screens/settings_page.dart';
 
 class HomeTab extends StatefulWidget {
-  const HomeTab({super.key});
+  final Function(bool) onToggleDarkMode;
+  final bool isDarkMode;
+  final Function(bool) onToggleKoreanMode;
+  final bool isKoreanMode;
+
+  const HomeTab({
+    super.key,
+    required this.onToggleDarkMode,
+    required this.isDarkMode,
+    required this.onToggleKoreanMode,
+    required this.isKoreanMode,
+  });
 
   @override
   State<HomeTab> createState() => _HomeTabState();
@@ -110,7 +122,7 @@ class _HomeTabState extends State<HomeTab> {
 
           const SizedBox(height: 20),
 
-          // 🎯 메뉴 버튼들 (게시물 버튼에 onTap 추가됨)
+          // 🎯 메뉴 버튼들
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Wrap(
@@ -118,7 +130,7 @@ class _HomeTabState extends State<HomeTab> {
               children: [
                 buildMenuButton(
                   Icons.map,
-                  '코스 선택',
+                  widget.isKoreanMode ? '코스 선택' : 'Course',
                   onTap: () {
                     Navigator.push(
                       context,
@@ -128,27 +140,52 @@ class _HomeTabState extends State<HomeTab> {
                 ),
                 buildMenuButton(
                   Icons.post_add,
-                  '게시물',
+                  widget.isKoreanMode ? '게시물' : 'Board',
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const BoardPage()),
+                      MaterialPageRoute(builder: (_) => BoardPage(isKoreanMode: widget.isKoreanMode)),
                     );
                   },
                 ),
                 buildMenuButton(
                   Icons.person,
-                  '프로필',
+                  widget.isKoreanMode ? '프로필' : 'Profile',
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const ProfileTab()),
+                      MaterialPageRoute(builder: (_) => ProfileTab(isKoreanMode: widget.isKoreanMode)),
                     );
                   },
                 ),
-                buildMenuButton(Icons.settings, '설정'),
-                buildMenuButton(Icons.notifications, '알림'),
-                buildMenuButton(Icons.info, '정보'),
+                buildMenuButton(
+                  Icons.settings,
+                  widget.isKoreanMode ? '설정' : 'Settings',
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => SettingsPage(
+                          onToggleDarkMode: widget.onToggleDarkMode,
+                          isDarkMode: widget.isDarkMode,
+                          onToggleKoreanMode: widget.onToggleKoreanMode,
+                          isKoreanMode: widget.isKoreanMode,
+                        ),
+                      ),
+                    );
+                    if (result == true) {
+                      setState(() {}); // 🔥 설정 끝나고 홈 리빌드
+                    }
+                  },
+                ),
+                buildMenuButton(
+                  Icons.notifications,
+                  widget.isKoreanMode ? '알림' : 'Notification',
+                ),
+                buildMenuButton(
+                  Icons.info,
+                  widget.isKoreanMode ? '정보' : 'Info',
+                ),
               ],
             ),
           ),
