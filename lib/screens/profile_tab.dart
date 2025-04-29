@@ -92,14 +92,15 @@ class _ProfileTabState extends State<ProfileTab> {
                     }
                   }
                 }
-                
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(isKoreanMode 
-                  ? '닉네임이 \"$newNickname\"(으)로 변경되었습니다.' 
-                  : 'Nickname changed to \"$newNickname\"')),
-              );
-            },
+
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(isKoreanMode
+                      ? '닉네임이 \"$newNickname\"(으)로 변경되었습니다.'
+                      : 'Nickname changed to \"$newNickname\"')),
+                );
+              }
+              },
             child: Text(isKoreanMode ? '저장' : 'Save'),
           ),
         ],

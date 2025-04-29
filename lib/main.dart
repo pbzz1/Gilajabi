@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:provider/provider.dart'; // ✅ 추가
+import 'package:provider/provider.dart';
 import 'login.dart';
-import 'providers/app_settings_provider.dart'; // ✅ 추가
+import 'providers/app_settings_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
