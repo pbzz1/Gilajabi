@@ -74,7 +74,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       if (context.mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const MyHomePage()),
+          MaterialPageRoute(
+            builder: (context) => const MyHomePage(), // ✅ 여기 깔끔하게 수정
+          ),
         );
       }
     } catch (error) {

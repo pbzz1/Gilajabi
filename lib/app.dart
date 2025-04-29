@@ -1,39 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'package:provider/provider.dart';
+import 'providers/app_settings_provider.dart'; // ✅ 추가
 import 'login.dart';
-import 'myhomepage.dart';
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  bool _isLoggedIn = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkLoginStatus();
-  }
-
-  Future<void> _checkLoginStatus() async {
-    final accessToken = await TokenManagerProvider.instance.manager.getToken();
-    setState(() {
-      _isLoggedIn = accessToken != null;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
+    return ChangeNotifierProvider(
+      create: (_) => AppSettingsProvider(), // ✅ AppSettingsProvider 생성
+      child: Consumer<AppSettingsProvider>(
+        builder: (context, settings, _) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: '길라잡이',
+            theme: ThemeData.light(),
+            darkTheme: ThemeData.dark(),
+            themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light, // ✅ 다크모드 적용
+            home: const LoginPage(), // ✅ 처음에는 LoginPage로
+          );
+        },
       ),
-      home: _isLoggedIn ? const MyHomePage() : const LoginPage(), // title 제거
     );
   }
 }

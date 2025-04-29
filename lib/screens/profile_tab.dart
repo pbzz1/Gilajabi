@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../login.dart';
 import 'package:gilajabi/board/liked_posts_page.dart';
 import 'package:gilajabi/board/my_posts_page.dart';
-import 'package:gilajabi/mypage/my_stamps_page.dart'; // ✅ 추가
+import '../providers/app_settings_provider.dart';
+import 'package:gilajabi/mypage/my_stamps_page.dart';
 
 class ProfileTab extends StatefulWidget {
-  const ProfileTab({super.key});
+  const ProfileTab({super.key}); // ✅ isKoreanMode 삭제
 
   @override
   State<ProfileTab> createState() => _ProfileTabState();
@@ -31,8 +33,11 @@ class _ProfileTabState extends State<ProfileTab> {
       profileImageUrl = user.kakaoAccount?.profile?.profileImageUrl;
 
       final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+      final settings = Provider.of<AppSettingsProvider>(context, listen: false);
+      final isKoreanMode = settings.isKoreanMode;
+
       setState(() {
-        nickname = doc.data()?['nickname'] ?? '사용자';
+        nickname = doc.data()?['nickname'] ?? (isKoreanMode ? '사용자' : 'User');
       });
     } catch (e) {
       print('사용자 정보 가져오기 실패: $e');
@@ -40,20 +45,25 @@ class _ProfileTabState extends State<ProfileTab> {
   }
 
   void _showNicknameEditDialog(BuildContext context) {
+    final settings = Provider.of<AppSettingsProvider>(context, listen: false);
+    final isKoreanMode = settings.isKoreanMode;
+
     final TextEditingController _controller = TextEditingController(text: nickname);
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('닉네임 변경'),
+        title: Text(isKoreanMode ? '닉네임 변경' : 'Change Nickname'),
         content: TextField(
           controller: _controller,
-          decoration: const InputDecoration(hintText: '새 닉네임 입력'),
+          decoration: InputDecoration(
+            hintText: isKoreanMode ? '새 닉네임 입력' : 'Enter new nickname',
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
+            child: Text(isKoreanMode ? '취소' : 'Cancel'),
           ),
           TextButton(
             onPressed: () async {
@@ -82,14 +92,15 @@ class _ProfileTabState extends State<ProfileTab> {
                     }
                   }
                 }
-
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('닉네임이 "$newNickname"(으)로 변경됨')),
-                );
-              }
+                
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(isKoreanMode 
+                  ? '닉네임이 \"$newNickname\"(으)로 변경되었습니다.' 
+                  : 'Nickname changed to \"$newNickname\"')),
+              );
             },
-            child: const Text('저장'),
+            child: Text(isKoreanMode ? '저장' : 'Save'),
           ),
         ],
       ),
@@ -136,8 +147,13 @@ class _ProfileTabState extends State<ProfileTab> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<AppSettingsProvider>(context); // ✅ Provider로 가져오기
+    final isKoreanMode = settings.isKoreanMode;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('내 프로필')),
+      appBar: AppBar(
+        title: Text(isKoreanMode ? '내 프로필' : 'My Profile'),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -155,7 +171,7 @@ class _ProfileTabState extends State<ProfileTab> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(nickname ?? '사용자', style: const TextStyle(fontSize: 18)),
+                    Text(nickname ?? (isKoreanMode ? '사용자' : 'User'), style: const TextStyle(fontSize: 18)),
                     IconButton(
                       icon: const Icon(Icons.edit),
                       onPressed: () => _showNicknameEditDialog(context),
@@ -165,17 +181,15 @@ class _ProfileTabState extends State<ProfileTab> {
               ],
             ),
           ),
-
           const Divider(height: 40),
-
           ListTile(
             leading: const Icon(Icons.article_outlined),
-            title: const Text('내가 쓴 글'),
+            title: Text(isKoreanMode ? '내가 쓴 글' : 'My Posts'),
             onTap: _onMyPostsPressed,
           ),
           ListTile(
             leading: const Icon(Icons.favorite_border),
-            title: const Text('좋아요한 글'),
+            title: Text(isKoreanMode ? '좋아요한 글' : 'Liked Posts'),
             onTap: _onLikedPostsPressed,
           ),
           ListTile(
@@ -183,14 +197,12 @@ class _ProfileTabState extends State<ProfileTab> {
             title: const Text('내 스탬프 보기'),
             onTap: _onMyStampsPressed,
           ),
-
           const Divider(height: 40),
-
           Center(
             child: ElevatedButton.icon(
               onPressed: _logout,
               icon: const Icon(Icons.logout),
-              label: const Text('로그아웃'),
+              label: Text(isKoreanMode ? '로그아웃' : 'Logout'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,
                 foregroundColor: Colors.white,
