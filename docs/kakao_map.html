@@ -110,14 +110,16 @@
             )
           });
 
-          map.setCenter(userLatLng);
+          // ✅ 부드럽게 이동
+          map.panTo(userLatLng);
         } else {
           alert("현재 위치 정보가 없습니다.");
         }
       };
 
       window.moveToDefault = function () {
-        map.setBounds(bounds);  // 👈 모든 코스 경계를 보여줌
+        // ✅ 부드럽게 이동
+        map.panTo(defaultCenter);
       };
 
       const courses = [
@@ -192,7 +194,7 @@
             overlay.setMap(map);
 
             path.forEach(latlng => bounds.extend(latlng));
-            map.setBounds(bounds);  // 폴리라인 추가할 때마다 갱신
+            map.setBounds(bounds);
           });
       });
     });
