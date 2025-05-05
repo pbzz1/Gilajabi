@@ -71,11 +71,13 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
     });
   }
 
-  void _startTracking() {
+  void _startTracking() async {
+    final position = await Geolocator.getCurrentPosition();
+    _mapKey.currentState?.updateUserLocation(position.latitude, position.longitude);
+    await Future.delayed(const Duration(seconds: 3));
+
     _positionStream = Geolocator.getPositionStream().listen((position) {
-      if (_followUser) {
-        _mapKey.currentState?.updateUserLocation(position.latitude, position.longitude);
-      }
+      _mapKey.currentState?.updateUserLocation(position.latitude, position.longitude);
 
       if (remainingStamps.isNotEmpty) {
         targetPoint = findClosestStamp(position.latitude, position.longitude, remainingStamps);
