@@ -195,7 +195,7 @@ class _ProfileTabState extends State<ProfileTab> {
           ),
           ListTile(
             leading: const Icon(Icons.map_outlined),
-            title: const Text('내 스탬프 보기'),
+            title: Text( isKoreanMode ? '내 스탬프 보기' : 'My Stamps'),
             onTap: _onMyStampsPressed,
           ),
           const Divider(height: 40),

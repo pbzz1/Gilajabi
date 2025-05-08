@@ -157,7 +157,7 @@ class _HomeTabState extends State<HomeTab> {
           children: [
             Icon(icon, size: 30, color: Colors.black87),
             const SizedBox(height: 8),
-            Text(label, style: const TextStyle(fontSize: 14)),
+            Text(label, style: const TextStyle(fontSize: 14,color: Colors.black)),  
           ],
         ),
       ),
@@ -221,9 +221,12 @@ class _HomeTabState extends State<HomeTab> {
                     context,
                     MaterialPageRoute(builder: (_) => const SettingsPage()),
                   );
-                  if (result == true) setState(() {});
-                }),
-                buildMenuButton(Icons.edit_note, '메모장', onTap: () {
+                  
+                  if (result == true) {
+                    setState(() {}); // 🔥 설정 끝나고 홈 리빌드
+                  }
+                },),
+                buildMenuButton(Icons.edit_note, isKoreanMode ? '메모장' : 'Memo', onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const MemoPage()));
                 }),
                 buildMenuButton(Icons.info, isKoreanMode ? '정보' : 'Info', onTap: () {
