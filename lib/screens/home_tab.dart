@@ -25,8 +25,9 @@ class _HomeTabState extends State<HomeTab> {
   late Timer _timer;
 
   Stream<StepCount>? _stepCountStream;
-  int _steps = 0; // 화면에 표시할 걸음 수
-  int _baseDeviceSteps = 0; // 디바이스 누적 기준값
+  int _steps = 0;
+  int _baseDeviceSteps = 0;
+  int _latestDeviceSteps = 0;
 
   final List<String> _bannerImages = [
     'assets/images/homeBanner0.png',
@@ -38,7 +39,6 @@ class _HomeTabState extends State<HomeTab> {
   @override
   void initState() {
     super.initState();
-    _loadBaseDeviceSteps();
     _requestActivityPermission();
     _startListening();
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
@@ -58,16 +58,30 @@ class _HomeTabState extends State<HomeTab> {
     }
   }
 
-  Future<void> _loadBaseDeviceSteps() async {
+  Future<void> _syncTodaySteps() async {
     final prefs = await SharedPreferences.getInstance();
-    _baseDeviceSteps = prefs.getInt('baseDeviceSteps') ?? 0;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day); // 자정 기준
+
+    final savedDateStr = prefs.getString('lastStepResetDate');
+    final savedDate = savedDateStr != null ? DateTime.tryParse(savedDateStr) : null;
+
+    if (savedDate == null || savedDate.isBefore(today)) {
+      _baseDeviceSteps = _latestDeviceSteps;
+      await prefs.setInt('baseDeviceSteps', _baseDeviceSteps);
+      await prefs.setString('lastStepResetDate', today.toIso8601String());
+    } else {
+      _baseDeviceSteps = prefs.getInt('baseDeviceSteps') ?? 0;
+    }
   }
 
   void _startListening() {
     _stepCountStream = Pedometer.stepCountStream;
-    _stepCountStream?.listen((StepCount event) {
+    _stepCountStream?.listen((StepCount event) async {
+      _latestDeviceSteps = event.steps;
+      await _syncTodaySteps();
       setState(() {
-        _steps = event.steps - _baseDeviceSteps;
+        _steps = _latestDeviceSteps - _baseDeviceSteps;
         if (_steps < 0) _steps = 0;
       });
     }).onError((error) {
@@ -100,8 +114,13 @@ class _HomeTabState extends State<HomeTab> {
 
   void _resetSteps() async {
     final prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
     final lastDeviceSteps = _steps + _baseDeviceSteps;
     await prefs.setInt('baseDeviceSteps', lastDeviceSteps);
+    await prefs.setString('lastStepResetDate', today.toIso8601String());
+
     setState(() {
       _baseDeviceSteps = lastDeviceSteps;
       _steps = 0;
@@ -147,15 +166,13 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
-    final settings = Provider.of<AppSettingsProvider>(context); // ✅ Provider로 상태 가져오기
+    final settings = Provider.of<AppSettingsProvider>(context);
     final isKoreanMode = settings.isKoreanMode;
 
     return Scaffold(
       body: ListView(
         children: [
-          const SizedBox(height: 16), // 👈 여기가 상단 여백!
-
-          // 배너
+          const SizedBox(height: 16),
           SizedBox(
             height: 200,
             child: PageView.builder(
@@ -184,10 +201,7 @@ class _HomeTabState extends State<HomeTab> {
               },
             ),
           ),
-
           const SizedBox(height: 20),
-
-          // 메뉴 버튼
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Wrap(
@@ -205,10 +219,9 @@ class _HomeTabState extends State<HomeTab> {
                 buildMenuButton(Icons.settings, isKoreanMode ? '설정' : 'Settings', onTap: () async {
                   final result = await Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const SettingsPage(), // ✅ 바로 const SettingsPage
-                    ),
+                    MaterialPageRoute(builder: (_) => const SettingsPage()),
                   );
+                  
                   if (result == true) {
                     setState(() {}); // 🔥 설정 끝나고 홈 리빌드
                   }
@@ -222,10 +235,7 @@ class _HomeTabState extends State<HomeTab> {
               ],
             ),
           ),
-
           const SizedBox(height: 20),
-
-          // 걸음 수 카드
           Card(
             margin: const EdgeInsets.symmetric(horizontal: 16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -250,9 +260,7 @@ class _HomeTabState extends State<HomeTab> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                     ),
                   ),
@@ -260,7 +268,6 @@ class _HomeTabState extends State<HomeTab> {
               ),
             ),
           ),
-
           const SizedBox(height: 20),
         ],
       ),
