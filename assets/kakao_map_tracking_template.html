@@ -15,14 +15,18 @@
           top: 10px;
           left: 10px;
           z-index: 10;
+          display: flex;
+          flex-direction: column;
         }
         .map-button {
-          padding: 10px 16px;
-          margin-bottom: 8px;
-          background-color: white;
-          border-radius: 6px;
-          border: 1px solid #ccc;
+          padding: 18px 30px;
+          font-size: 27px;
+          min-width: 270px;
           font-weight: bold;
+          border: none;
+          border-radius: 10px;
+          background-color: #ffffffee;
+          box-shadow: 0px 3px 6px rgba(0,0,0,0.3);
           cursor: pointer;
         }
     </style>
@@ -34,10 +38,13 @@
         <button class="map-button" onclick="moveToUser()">📍 내 위치 보기</button>
     </div>
 </div>
+
 <script>
     let map = null;
     let userMarker = null;
     let userLatLng = null;
+    let isFollowingUser = true;
+    let takenStampNames = []; // ✅ 찍은 스탬프 목록
     window.flutter_ready = false;
 
     kakao.maps.load(function () {
@@ -48,14 +55,16 @@
         level: 5
       });
 
-      // 위치 정보 불러오기 (자동 이동 없음)
+      kakao.maps.event.addListener(map, 'dragstart', function () {
+        isFollowingUser = false;
+        console.log('flutter_invokeStopFollowing');
+      });
+
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
           userLatLng = new kakao.maps.LatLng(lat, lng);
-        }, function (error) {
-          console.error("위치 정보를 가져오는 데 실패했습니다.", error);
         });
       }
 
@@ -63,7 +72,8 @@
     });
 
     function drawPolyline(pathPoints) {
-      if (!window.flutter_ready || !map) return;
+      if (!map || !window.flutter_ready) return;
+
       const latlngs = pathPoints.map(p => new kakao.maps.LatLng(p.lat, p.lng));
       const polyline = new kakao.maps.Polyline({
         path: latlngs,
@@ -73,51 +83,79 @@
         strokeStyle: 'solid'
       });
       polyline.setMap(map);
-      map.setCenter(latlngs[0]);
+
+      const bounds = new kakao.maps.LatLngBounds();
+      latlngs.forEach(p => bounds.extend(p));
+      map.setBounds(bounds);
+    }
+
+    function setTakenStampNames(nameList) {
+      takenStampNames = nameList;
     }
 
     function addStampMarkers(stamps) {
-      if (!window.flutter_ready || !map) return;
+      if (!map || !window.flutter_ready) return;
+
       stamps.forEach(stamp => {
+        const isTaken = takenStampNames.includes(stamp.name);
+        if (isTaken) return; // ✅ 찍은 스탬프는 마커 표시하지 않음
+
         new kakao.maps.Marker({
           position: new kakao.maps.LatLng(stamp.lat, stamp.lng),
           map: map,
-          title: stamp.name
+          title: stamp.name,
+          image: new kakao.maps.MarkerImage(
+            "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+            new kakao.maps.Size(24, 35)
+          )
         });
       });
     }
 
     function updateUserLocation(lat, lng) {
-      if (!window.flutter_ready || !map) return;
+      if (!map || !window.flutter_ready) return;
+
       const position = new kakao.maps.LatLng(lat, lng);
+      userLatLng = position;
+
       if (userMarker) userMarker.setMap(null);
       userMarker = new kakao.maps.Marker({
         position: position,
         map: map,
         title: '현재 위치',
         image: new kakao.maps.MarkerImage(
-          "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-          new kakao.maps.Size(24, 35)
+          'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+          new kakao.maps.Size(40, 40)
         )
       });
+
+      if (isFollowingUser) {
+        map.setLevel(2);
+        map.setCenter(position);
+      }
     }
 
     function moveToUser() {
-      if (!userLatLng || !map) {
+      if (!map || !userLatLng) {
         alert("위치 정보를 불러오지 못했습니다.");
         return;
       }
+
+      isFollowingUser = true;
+
       if (userMarker) userMarker.setMap(null);
       userMarker = new kakao.maps.Marker({
         position: userLatLng,
         map: map,
         title: '현재 위치',
         image: new kakao.maps.MarkerImage(
-          "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-          new kakao.maps.Size(24, 35)
+          'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+          new kakao.maps.Size(40, 40)
         )
       });
-      map.setCenter(userLatLng);
+
+      map.setLevel(2);
+      map.panTo(userLatLng);
     }
 </script>
 </body>

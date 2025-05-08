@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import '../../widgets/kakao_map_tracker.dart';
 import '../stamp_points.dart';
+import '../../myhomepage.dart';
 
 String? globalUserId;
 
@@ -34,8 +35,9 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
   StreamSubscription<Position>? _positionStream;
   List<PolylinePoint> _polylinePoints = [];
   List<StampPoint> remainingStamps = [];
-  bool _loading = true;
+  Set<String>? takenNames; // ✅ late 제거, null 허용
 
+  bool _loading = true;
   bool _followUser = true;
   double _distanceToTarget = 0.0;
   late StampPoint targetPoint;
@@ -44,8 +46,7 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
   @override
   void initState() {
     super.initState();
-    _loadUserId();
-    remainingStamps = List.from(widget.stampPoints);
+    _loadUserId(); // 내부에서 _loadUserStamps 호출됨
     _loadPolyline().then((_) => _startTracking());
   }
 
@@ -53,9 +54,30 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
     try {
       final user = await UserApi.instance.me();
       globalUserId = user.id.toString();
+      await _loadUserStamps();
     } catch (e) {
       print('userId 로드 실패: $e');
     }
+  }
+
+  Future<void> _loadUserStamps() async {
+    if (globalUserId == null) return;
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(globalUserId)
+        .collection('stamps')
+        .where('course', isEqualTo: widget.courseName)
+        .get();
+
+    final takenSet = snapshot.docs.map((doc) => doc['name'] as String).toSet();
+
+    setState(() {
+      takenNames = takenSet; // ✅ 초기화
+      remainingStamps = widget.stampPoints
+          .where((stamp) => !takenSet.contains(stamp.name))
+          .toList();
+    });
   }
 
   Future<void> _loadPolyline() async {
@@ -72,10 +94,13 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
   }
 
   void _startTracking() async {
+    final position = await Geolocator.getCurrentPosition();
+    _mapKey.currentState?.updateUserLocation(position.latitude, position.longitude);
+
+    await Future.delayed(const Duration(seconds: 3)); // 경로 먼저 보여주기
+
     _positionStream = Geolocator.getPositionStream().listen((position) {
-      if (_followUser) {
-        _mapKey.currentState?.updateUserLocation(position.latitude, position.longitude);
-      }
+      _mapKey.currentState?.updateUserLocation(position.latitude, position.longitude);
 
       if (remainingStamps.isNotEmpty) {
         targetPoint = findClosestStamp(position.latitude, position.longitude, remainingStamps);
@@ -88,11 +113,18 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
 
         setState(() {
           _distanceToTarget = distance;
-        });
 
-        if (distance <= 30) {
-          onReachedTarget();
-        }
+          if (distance <= 30) {
+            if (!_canStamp) {
+              _canStamp = true;
+              Fluttertoast.showToast(msg: "경유지 도착! 스탬프를 찍어주세요!");
+            }
+          } else {
+            if (_canStamp) {
+              _canStamp = false;
+            }
+          }
+        });
       }
     });
   }
@@ -116,16 +148,50 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
     return closest;
   }
 
-  void onReachedTarget() {
+  void onReachedTarget() async {
+    final stamp = targetPoint;
+
+    if (globalUserId == null) {
+      Fluttertoast.showToast(msg: "로그인이 필요합니다.");
+      return;
+    }
+
+    await saveStamp(
+      userId: globalUserId!,
+      courseName: widget.courseName,
+      stampName: stamp.name,
+      lat: stamp.latitude,
+      lng: stamp.longitude,
+    );
+
+    Fluttertoast.showToast(msg: "스탬프 저장 완료!");
+
     setState(() {
-      _canStamp = true;
+      remainingStamps.remove(stamp);
+      _canStamp = false;
+      takenNames!.add(stamp.name); // ✅ null 아님 확정
     });
 
-    Fluttertoast.showToast(
-      msg: "경유지 도착! 스탬프를 찍어주세요!",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-    );
+    // ✅ JS에 찍은 스탬프 이름 목록 다시 전달
+    final updatedNames = jsonEncode(takenNames!.toList());
+    _mapKey.currentState?.evaluateJavascript("setTakenStampNames($updatedNames);");
+
+    // ✅ 전체 스탬프 마커 다시 그림
+    final stampList = widget.stampPoints.map((s) => {
+      "name": s.name,
+      "lat": s.latitude,
+      "lng": s.longitude,
+    }).toList();
+    final jsonStampList = jsonEncode(stampList);
+    _mapKey.currentState?.evaluateJavascript("addStampMarkers($jsonStampList);");
+
+    if (remainingStamps.isEmpty) {
+      Fluttertoast.showToast(
+        msg: "🎉 모든 경유지 스탬프 완료!",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+      );
+    }
   }
 
   @override
@@ -136,20 +202,15 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ takenNames 초기화되지 않았을 경우 로딩 표시
+    if (takenNames == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${widget.courseName} 코스 추적'),
-        actions: [
-          IconButton(
-            icon: Icon(_followUser ? Icons.gps_fixed : Icons.gps_off),
-            onPressed: () {
-              setState(() {
-                _followUser = !_followUser;
-              });
-            },
-          ),
-        ],
-      ),
+      appBar: AppBar(title: Text('${widget.courseName} 코스 추적')),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : Stack(
@@ -158,10 +219,45 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
             key: _mapKey,
             polylinePoints: _polylinePoints,
             stampPoints: widget.stampPoints,
+            takenStampNames: takenNames!,
+            onStopFollowing: () => setState(() => _followUser = false),
           ),
           Positioned(
-            top: 20,
+            bottom: 160,
             left: 20,
+            right: 20,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.grey[800]),
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MyHomePage()),
+                      (route) => false,
+                );
+              },
+              child: const Text("🏁 코스 종료", style: TextStyle(fontSize: 16)),
+            ),
+          ),
+
+          Positioned(
+            top: 70,
+            right: 20,
+            child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(8),
+          ),
+              child: Text(
+                "${widget.stampPoints.length - remainingStamps.length} / ${widget.stampPoints.length} 스탬프 완료",
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+          ),
+
+          Positioned(
+            top: 20,
+            right: 20,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -181,45 +277,7 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
             child: Visibility(
               visible: _canStamp,
               child: ElevatedButton(
-                onPressed: () async {
-                  final stamp = targetPoint;
-
-                  if (globalUserId == null) {
-                    Fluttertoast.showToast(
-                      msg: "로그인이 필요합니다.",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                    );
-                    return;
-                  }
-
-                  await saveStamp(
-                    userId: globalUserId!,
-                    courseName: widget.courseName,
-                    stampName: stamp.name,
-                    lat: stamp.latitude,
-                    lng: stamp.longitude,
-                  );
-
-                  Fluttertoast.showToast(
-                    msg: "스탬프 저장 완료!",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                  );
-
-                  setState(() {
-                    remainingStamps.remove(stamp);
-                    _canStamp = false;
-
-                    if (remainingStamps.isEmpty) {
-                      Fluttertoast.showToast(
-                        msg: "🎉 모든 경유지 스탬프 완료!",
-                        toastLength: Toast.LENGTH_LONG,
-                        gravity: ToastGravity.CENTER,
-                      );
-                    }
-                  });
-                },
+                onPressed: onReachedTarget,
                 child: const Text("📸 스탬프 찍기"),
               ),
             ),
