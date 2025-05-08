@@ -6,12 +6,14 @@ import '../course/stamp_points.dart';
 class KakaoMapTracker extends StatefulWidget {
   final List<Map<String, double>> polylinePoints;
   final List<StampPoint> stampPoints;
+  final Set<String> takenStampNames;
   final void Function()? onStopFollowing;
 
   const KakaoMapTracker({
     super.key,
     required this.polylinePoints,
     required this.stampPoints,
+    required this.takenStampNames,
     this.onStopFollowing,
   });
 
@@ -34,9 +36,15 @@ class KakaoMapTrackerState extends State<KakaoMapTracker> {
         _webViewController = controller;
         await _waitForMapReady();
 
+        // ✅ 1. 찍은 스탬프 목록 전달
+        final takenJson = jsonEncode(widget.takenStampNames.toList());
+        await controller.evaluateJavascript(source: "setTakenStampNames($takenJson);");
+
+        // ✅ 2. 폴리라인 표시
         final polylineJson = jsonEncode(widget.polylinePoints);
         await controller.evaluateJavascript(source: "drawPolyline($polylineJson);");
 
+        // ✅ 3. 스탬프 마커 표시 (색상 구분 포함)
         final stampJson = jsonEncode(widget.stampPoints.map((e) => {
           "name": e.name,
           "lat": e.latitude,
@@ -65,6 +73,10 @@ class KakaoMapTrackerState extends State<KakaoMapTracker> {
     );
   }
 
+  void evaluateJavascript(String js) {
+    _webViewController?.evaluateJavascript(source: js);
+  }
+
   Future<void> _waitForMapReady() async {
     for (int i = 0; i < 10; i++) {
       final result = await _webViewController?.evaluateJavascript(
@@ -73,9 +85,5 @@ class KakaoMapTrackerState extends State<KakaoMapTracker> {
       if (result == true || result == 'true') break;
       await Future.delayed(const Duration(milliseconds: 200));
     }
-  }
-
-  void evaluateJavascript(String js) {
-    _webViewController?.evaluateJavascript(source: js);
   }
 }

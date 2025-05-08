@@ -44,6 +44,7 @@
     let userMarker = null;
     let userLatLng = null;
     let isFollowingUser = true;
+    let takenStampNames = []; // ✅ 찍은 스탬프 목록
     window.flutter_ready = false;
 
     kakao.maps.load(function () {
@@ -88,14 +89,25 @@
       map.setBounds(bounds);
     }
 
+    function setTakenStampNames(nameList) {
+      takenStampNames = nameList;
+    }
+
     function addStampMarkers(stamps) {
       if (!map || !window.flutter_ready) return;
 
       stamps.forEach(stamp => {
+        const isTaken = takenStampNames.includes(stamp.name);
+        if (isTaken) return; // ✅ 찍은 스탬프는 마커 표시하지 않음
+
         new kakao.maps.Marker({
           position: new kakao.maps.LatLng(stamp.lat, stamp.lng),
           map: map,
-          title: stamp.name
+          title: stamp.name,
+          image: new kakao.maps.MarkerImage(
+            "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+            new kakao.maps.Size(24, 35)
+          )
         });
       });
     }
@@ -104,7 +116,7 @@
       if (!map || !window.flutter_ready) return;
 
       const position = new kakao.maps.LatLng(lat, lng);
-      userLatLng = position; // ✅ 항상 최신 위치로 저장
+      userLatLng = position;
 
       if (userMarker) userMarker.setMap(null);
       userMarker = new kakao.maps.Marker({
@@ -112,8 +124,8 @@
         map: map,
         title: '현재 위치',
         image: new kakao.maps.MarkerImage(
-          "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-          new kakao.maps.Size(24, 35)
+          'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+          new kakao.maps.Size(40, 40)
         )
       });
 
@@ -137,13 +149,13 @@
         map: map,
         title: '현재 위치',
         image: new kakao.maps.MarkerImage(
-          "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-          new kakao.maps.Size(24, 35)
+          'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+          new kakao.maps.Size(40, 40)
         )
       });
 
       map.setLevel(2);
-      map.panTo(userLatLng); // ✅ 부드럽게 이동
+      map.panTo(userLatLng);
     }
 </script>
 </body>
