@@ -3,15 +3,16 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'login.dart';
+import 'onboarding_page.dart'; // ✅ 온보딩 페이지 추가
 import 'providers/app_settings_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 플랫폼 뷰 등록 초기화 (Android용)
   await InAppWebViewController.setWebContentsDebuggingEnabled(true);
-
   await Firebase.initializeApp();
 
   KakaoSdk.init(
@@ -19,24 +20,28 @@ void main() async {
     javaScriptAppKey: '8d8465643b5de1002ccbe7b3197fd029',
   );
 
-  runApp(const MyApp());
+  final prefs = await SharedPreferences.getInstance();
+  final isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
+
+  runApp(MyApp(isFirstLaunch: isFirstLaunch));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isFirstLaunch;
+  const MyApp({super.key, required this.isFirstLaunch});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => AppSettingsProvider(), // ✅ Provider 생성
+      create: (_) => AppSettingsProvider(),
       child: Consumer<AppSettingsProvider>(
         builder: (context, settings, _) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: ThemeData.light(),
             darkTheme: ThemeData.dark(),
-            themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light, // ✅ 다크모드 적용
-            home: const LoginPage(), // ✅ 그냥 const LoginPage()
+            themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            home: isFirstLaunch ? const OnboardingPage() : const LoginPage(),
           );
         },
       ),

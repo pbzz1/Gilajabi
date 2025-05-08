@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // ✅ 추가
 import '../providers/app_settings_provider.dart'; // ✅ 추가
+import 'terms_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key}); // ✅ 파라미터 모두 제거
@@ -50,6 +51,12 @@ class SettingsPage extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.policy),
             title: const Text('이용약관'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const TermsPage()),
+              );
+            },
           ),
         ],
       ),
