@@ -240,8 +240,8 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
           ),
 
           Positioned(
-            top: 20,
-            left: 20,
+            top: 70,
+            right: 20,
             child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
