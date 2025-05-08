@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:provider/provider.dart'; // ✅ 추가
+import '../providers/app_settings_provider.dart'; // ✅ 추가
 import 'memo_edit_page.dart';
 
 class Memo {
@@ -79,6 +81,7 @@ class _MemoPageState extends State<MemoPage> {
   }
 
   void _showDeleteMenu(int index) {
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context, listen: false).isKoreanMode;
     showModalBottomSheet(
       context: context,
       builder: (context) => SafeArea(
@@ -87,7 +90,7 @@ class _MemoPageState extends State<MemoPage> {
           children: [
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.redAccent),
-              title: const Text('삭제'),
+              title: Text(isKoreanMode ? '삭제' : 'Delete'),
               onTap: () {
                 Navigator.pop(context);
                 _confirmDelete(index);
@@ -100,22 +103,23 @@ class _MemoPageState extends State<MemoPage> {
   }
 
   void _confirmDelete(int index) {
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context, listen: false).isKoreanMode;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('메모 삭제'),
-        content: const Text('정말 이 메모를 삭제하시겠습니까?'),
+        title: Text(isKoreanMode ? '메모 삭제' : 'Delete Memo'),
+        content: Text(isKoreanMode ? '정말 이 메모를 삭제하시겠습니까?' : 'Are you sure you want to delete this memo?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
+            child: Text(isKoreanMode ? '취소' : 'Cancel'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _deleteMemo(index);
             },
-            child: const Text('삭제', style: TextStyle(color: Colors.red)),
+            child: Text(isKoreanMode ? '삭제' : 'Delete', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -131,9 +135,11 @@ class _MemoPageState extends State<MemoPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context).isKoreanMode;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('메모장'),
+        title: Text(isKoreanMode ? '메모장' : 'Memo Pad'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(12),
@@ -188,6 +194,7 @@ class _MemoPageState extends State<MemoPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _navigateToEdit(),
         child: const Icon(Icons.add),
+        tooltip: isKoreanMode ? '새 메모 추가' : 'Add new memo',
       ),
     );
   }

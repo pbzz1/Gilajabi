@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // ✅ 추가
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-
+import '../providers/app_settings_provider.dart'; // ✅ 추가
 import 'info/baegak_info_page.dart';
 import 'info/naksan_info_page.dart';
 import 'info/heunginjimun_info_page.dart';
@@ -82,8 +83,12 @@ class _CoursePageState extends State<CoursePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context).isKoreanMode;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('코스 선택')),
+      appBar: AppBar(
+        title: Text(isKoreanMode ? '코스 선택' : 'Course'),
+      ),
       body: WebViewWidget(controller: _controller),
     );
   }
