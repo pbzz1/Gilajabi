@@ -11,6 +11,17 @@ class MyStampsPage extends StatefulWidget {
 
 class _MyStampsPageState extends State<MyStampsPage> {
   String? userId;
+  Map<String, bool> expandedCourses = {}; // ✅ 접힘 상태 관리
+
+  // ✅ 각 코스의 전체 스탬프 수 정의 (수동 설정)
+  final Map<String, int> totalStampsPerCourse = {
+    '백악': 3,
+    '낙산': 3,
+    '흥인지문': 3,
+    '남산': 3,
+    '숭례문': 3,
+    '인왕산': 3,
+  };
 
   @override
   void initState() {
@@ -59,21 +70,62 @@ class _MyStampsPageState extends State<MyStampsPage> {
             return const Center(child: Text('아직 찍은 스탬프가 없습니다.'));
           }
 
-          return ListView.builder(
-            itemCount: stamps.length,
-            itemBuilder: (context, index) {
-              final data = stamps[index].data() as Map<String, dynamic>;
+          // ✅ 코스별로 그룹화
+          final Map<String, List<QueryDocumentSnapshot>> courseGroups = {};
+          for (var doc in stamps) {
+            final data = doc.data() as Map<String, dynamic>;
+            final course = data['course'] ?? '기타';
+            courseGroups.putIfAbsent(course, () => []).add(doc);
+          }
 
-              return ListTile(
-                leading: const Icon(Icons.location_on),
-                title: Text(data['name'] ?? '스탬프'),
-                subtitle: Text('코스: ${data['course'] ?? ''}'),
-                trailing: Text(
-                  (data['timestamp'] as Timestamp?)?.toDate().toString().substring(0, 16) ?? '',
-                  style: const TextStyle(fontSize: 12),
-                ),
+          return ListView(
+            children: courseGroups.entries.map((entry) {
+              final course = entry.key;
+              final courseStamps = entry.value;
+              final total = totalStampsPerCourse[course] ?? courseStamps.length;
+              final percent = ((courseStamps.length / total) * 100).round();
+
+              final isExpanded = expandedCourses[course] ?? true;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        expandedCourses[course] = !(expandedCourses[course] ?? true);
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      color: Colors.grey[300],
+                      width: double.infinity,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            course,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          Text('$percent% 완료'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (isExpanded)
+                    ...courseStamps.map((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      return ListTile(
+                        leading: const Icon(Icons.location_on),
+                        title: Text(data['name'] ?? '스탬프'),
+                        subtitle: Text(
+                          (data['timestamp'] as Timestamp?)?.toDate().toString().substring(0, 16) ?? '',
+                        ),
+                      );
+                    }).toList(),
+                ],
               );
-            },
+            }).toList(),
           );
         },
       ),
