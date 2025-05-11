@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:gilajabi/screens/profile_tab.dart';
 import '../course/course_page.dart';
-import '../board/board_page.dart';
 import '../screens/settings_page.dart';
 import '../providers/app_settings_provider.dart';
-import 'package:gilajabi/screens/info_page.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -210,28 +207,18 @@ class _HomeTabState extends State<HomeTab> {
                 buildMenuButton(Icons.map, isKoreanMode ? '코스 선택' : 'Course', onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const CoursePage()));
                 }),
-                buildMenuButton(Icons.post_add, isKoreanMode ? '게시물' : 'Board', onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const BoardPage()));
-                }),
-                buildMenuButton(Icons.person, isKoreanMode ? '프로필' : 'Profile', onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileTab()));
+                buildMenuButton(Icons.edit_note, isKoreanMode ? '메모장' : 'Memo', onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const MemoPage()));
                 }),
                 buildMenuButton(Icons.settings, isKoreanMode ? '설정' : 'Settings', onTap: () async {
                   final result = await Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const SettingsPage()),
                   );
-                  
                   if (result == true) {
                     setState(() {}); // 🔥 설정 끝나고 홈 리빌드
                   }
                 },),
-                buildMenuButton(Icons.edit_note, isKoreanMode ? '메모장' : 'Memo', onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const MemoPage()));
-                }),
-                buildMenuButton(Icons.info, isKoreanMode ? '정보' : 'Info', onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const InfoPage()));
-                }),
               ],
             ),
           ),
