@@ -9,11 +9,10 @@ class MyStampsPage extends StatefulWidget {
   State<MyStampsPage> createState() => _MyStampsPageState();
 }
 
-class _MyStampsPageState extends State<MyStampsPage> {
+class _MyStampsPageState extends State<MyStampsPage> with TickerProviderStateMixin {
   String? userId;
   Map<String, bool> expandedCourses = {}; // ✅ 접힘 상태 관리
 
-  // ✅ 각 코스의 전체 스탬프 수 정의 (수동 설정)
   final Map<String, int> totalStampsPerCourse = {
     '백악': 3,
     '낙산': 3,
@@ -70,7 +69,6 @@ class _MyStampsPageState extends State<MyStampsPage> {
             return const Center(child: Text('아직 찍은 스탬프가 없습니다.'));
           }
 
-          // ✅ 코스별로 그룹화
           final Map<String, List<QueryDocumentSnapshot>> courseGroups = {};
           for (var doc in stamps) {
             final data = doc.data() as Map<String, dynamic>;
@@ -93,7 +91,7 @@ class _MyStampsPageState extends State<MyStampsPage> {
                   InkWell(
                     onTap: () {
                       setState(() {
-                        expandedCourses[course] = !(expandedCourses[course] ?? true);
+                        expandedCourses[course] = !isExpanded;
                       });
                     },
                     child: Container(
@@ -103,26 +101,48 @@ class _MyStampsPageState extends State<MyStampsPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            course,
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          Row(
+                            children: [
+                              Icon(
+                                isExpanded ? Icons.expand_less : Icons.expand_more,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                course,
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ],
                           ),
                           Text('$percent% 완료'),
                         ],
                       ),
+
                     ),
                   ),
-                  if (isExpanded)
-                    ...courseStamps.map((doc) {
-                      final data = doc.data() as Map<String, dynamic>;
-                      return ListTile(
-                        leading: const Icon(Icons.location_on),
-                        title: Text(data['name'] ?? '스탬프'),
-                        subtitle: Text(
-                          (data['timestamp'] as Timestamp?)?.toDate().toString().substring(0, 16) ?? '',
-                        ),
-                      );
-                    }).toList(),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    transitionBuilder: (child, animation) => SizeTransition(
+                      sizeFactor: animation,
+                      axisAlignment: -1.0,
+                      child: child,
+                    ),
+                    child: isExpanded
+                        ? Column(
+                      key: ValueKey(true),
+                      children: courseStamps.map((doc) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        return ListTile(
+                          leading: const Icon(Icons.location_on),
+                          title: Text(data['name'] ?? '스탬프'),
+                          subtitle: Text(
+                            (data['timestamp'] as Timestamp?)?.toDate().toString().substring(0, 16) ?? '',
+                          ),
+                        );
+                      }).toList(),
+                    )
+                        : const SizedBox.shrink(key: ValueKey(false)),
+                  ),
                 ],
               );
             }).toList(),
