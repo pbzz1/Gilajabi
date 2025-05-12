@@ -199,9 +199,9 @@ class _HomeTabState extends State<HomeTab> {
               },
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 15),
           const WeatherBanner(),
-          const SizedBox(height: 20),
+          const SizedBox(height: 15),
           Card(
             margin: const EdgeInsets.symmetric(horizontal: 16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -234,7 +234,7 @@ class _HomeTabState extends State<HomeTab> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 15),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Wrap(

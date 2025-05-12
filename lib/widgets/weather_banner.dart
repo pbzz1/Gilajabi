@@ -11,27 +11,38 @@ class WeatherBanner extends StatefulWidget {
   State<WeatherBanner> createState() => _WeatherBannerState();
 }
 
-class _WeatherBannerState extends State<WeatherBanner> {
+class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProviderStateMixin {
   String? description;
   double? temp;
   String? locationName;
+  String? iconCode;
   String? error;
+  bool isLoading = true;
+  late AnimationController _rotationController;
 
   @override
   void initState() {
     super.initState();
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
     _loadWeather();
   }
 
-  Future<void> _loadWeather() async {
-    try {
-      setState(() {
-        error = null;
-        description = null;
-        temp = null;
-        locationName = null;
-      });
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
+  }
 
+  Future<void> _loadWeather() async {
+    setState(() {
+      isLoading = true;
+      error = null;
+    });
+
+    try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -47,13 +58,11 @@ class _WeatherBannerState extends State<WeatherBanner> {
       final lat = position.latitude;
       final lon = position.longitude;
 
-      // ✅ 위치 → 주소 변환 (한글 시/구/동)
       final placemarks = await placemarkFromCoordinates(lat, lon, localeIdentifier: "ko");
       final placemark = placemarks.first;
-      locationName =
-          "${placemark.administrativeArea ?? ''} ${placemark.locality ?? ''} ${placemark.subLocality ?? ''}".trim();
+      locationName = "${placemark.administrativeArea ?? ''} ${placemark.locality ?? ''} ${placemark.subLocality ?? ''}".trim();
 
-      final apiKey = '37b530c875ea7fa6fc68a929423bcf0a'; // OpenWeatherMap API 키
+      final apiKey = '37b530c875ea7fa6fc68a929423bcf0a'; // Replace with your real API key
       final url = Uri.parse(
         'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey&units=metric&lang=kr',
       );
@@ -65,39 +74,26 @@ class _WeatherBannerState extends State<WeatherBanner> {
       }
 
       final data = jsonDecode(response.body);
-      if (data['weather'] == null || data['main'] == null) {
-        setState(() => error = "날씨 정보가 없습니다.");
-        return;
-      }
-
       setState(() {
         description = data['weather'][0]['description'];
+        iconCode = data['weather'][0]['icon'];
         temp = data['main']['temp']?.toDouble();
-        error = null;
+        isLoading = false;
       });
     } catch (e) {
-      setState(() => error = "날씨 정보를 불러오지 못했습니다.");
-      print("날씨 오류: $e");
+      setState(() {
+        error = "날씨 정보를 불러오지 못했습니다.";
+        isLoading = false;
+      });
     }
   }
 
-  /// ✅ 날씨 설명 기반 아이콘
-  IconData getWeatherIcon(String? desc) {
-    final d = desc?.toLowerCase() ?? '';
-    if (d.contains('비')) return Icons.umbrella;
-    if (d.contains('눈')) return Icons.ac_unit;
-    if (d.contains('맑')) return Icons.wb_sunny;
-    if (d.contains('흐림') || d.contains('구름')) return Icons.cloud;
-    return Icons.wb_cloudy;
-  }
-
-  /// ✅ 기온 기반 색상
-  Color getWeatherColor(double? temp) {
-    if (temp == null) return Colors.grey;
-    if (temp >= 30) return Colors.redAccent;
-    if (temp >= 20) return Colors.orange;
-    if (temp >= 10) return Colors.blueGrey;
-    return Colors.lightBlue;
+  Color getBackgroundColor(double? temp) {
+    if (temp == null) return Colors.grey.shade300;
+    if (temp >= 30) return Colors.red.shade100;
+    if (temp >= 20) return Colors.orange.shade100;
+    if (temp >= 10) return Colors.blueGrey.shade100;
+    return Colors.lightBlue.shade100;
   }
 
   @override
@@ -113,57 +109,69 @@ class _WeatherBannerState extends State<WeatherBanner> {
         "$description / ${temp!.toStringAsFixed(1)}°C",
         style: TextStyle(
           fontSize: 16,
-          color: getWeatherColor(temp),
+          fontWeight: FontWeight.w500,
+          color: Colors.black87,
         ),
       );
     }();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Card(
-        elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+      decoration: BoxDecoration(
+        color: getBackgroundColor(temp),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              // 위치 + 새로고침
-              Row(
-                children: [
-                  const Icon(Icons.location_on, color: Colors.blue),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      locationName ?? '위치 확인 중...',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    onPressed: _loadWeather,
-                  ),
-                ],
+              const Icon(Icons.location_on, color: Colors.blue),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  locationName ?? '위치 확인 중...',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
-              const SizedBox(height: 12),
-
-              // 날씨 아이콘 + 텍스트
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    getWeatherIcon(description),
-                    size: 40,
-                    color: getWeatherColor(temp),
-                  ),
-                  const SizedBox(width: 12),
-                  infoText,
-                ],
+              AnimatedBuilder(
+                animation: _rotationController,
+                builder: (_, child) {
+                  return Transform.rotate(
+                    angle: _rotationController.value * 6.28,
+                    child: child,
+                  );
+                },
+                child: IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () {
+                    _rotationController.forward(from: 0);
+                    _loadWeather();
+                  },
+                ),
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (iconCode != null)
+                Image.network(
+                  'https://openweathermap.org/img/wn/$iconCode@2x.png',
+                  width: 50,
+                  height: 50,
+                ),
+              const SizedBox(width: 12),
+              infoText,
+            ],
+          ),
+        ],
       ),
     );
   }
 }
+
