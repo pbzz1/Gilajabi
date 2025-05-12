@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../course/course_page.dart';
 import '../screens/settings_page.dart';
 import '../providers/app_settings_provider.dart';
+import '../widgets/weather_banner.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -199,29 +200,7 @@ class _HomeTabState extends State<HomeTab> {
             ),
           ),
           const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              children: [
-                buildMenuButton(Icons.map, isKoreanMode ? '코스 선택' : 'Course', onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const CoursePage()));
-                }),
-                buildMenuButton(Icons.edit_note, isKoreanMode ? '메모장' : 'Memo', onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const MemoPage()));
-                }),
-                buildMenuButton(Icons.settings, isKoreanMode ? '설정' : 'Settings', onTap: () async {
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SettingsPage()),
-                  );
-                  if (result == true) {
-                    setState(() {}); // 🔥 설정 끝나고 홈 리빌드
-                  }
-                },),
-              ],
-            ),
-          ),
+          const WeatherBanner(),
           const SizedBox(height: 20),
           Card(
             margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -253,6 +232,30 @@ class _HomeTabState extends State<HomeTab> {
                   ),
                 ],
               ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              children: [
+                buildMenuButton(Icons.map, isKoreanMode ? '코스 선택' : 'Course', onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const CoursePage()));
+                }),
+                buildMenuButton(Icons.edit_note, isKoreanMode ? '메모장' : 'Memo', onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const MemoPage()));
+                }),
+                buildMenuButton(Icons.settings, isKoreanMode ? '설정' : 'Settings', onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SettingsPage()),
+                  );
+                  if (result == true) {
+                    setState(() {}); // 🔥 설정 끝나고 홈 리빌드
+                  }
+                },),
+              ],
             ),
           ),
           const SizedBox(height: 20),
