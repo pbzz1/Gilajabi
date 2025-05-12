@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:vibration/vibration.dart';
 import '../../widgets/kakao_map_tracker.dart';
 import '../stamp_points.dart';
 import '../../myhomepage.dart';
@@ -111,12 +112,16 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
           targetPoint.longitude,
         );
 
-        setState(() {
+        setState(() async {
           _distanceToTarget = distance;
 
           if (distance <= 30) {
             if (!_canStamp) {
               _canStamp = true;
+
+              if (await Vibration.hasVibrator()) {
+                Vibration.vibrate(duration: 500); // 0.5초 진동
+          }
               Fluttertoast.showToast(msg: "경유지 도착! 스탬프를 찍어주세요!");
             }
           } else {
