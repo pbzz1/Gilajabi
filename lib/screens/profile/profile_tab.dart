@@ -154,7 +154,7 @@ class _ProfileTabState extends State<ProfileTab> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isKoreanMode ? '내 프로필' : 'My Profile'),
+        title: Text(isKoreanMode ? '프로필' : 'Profile'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

@@ -48,7 +48,7 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
         if (_steps < 0) _steps = 0;
       });
     }).onError((error) {
-      print('만보기 오류: \$error');
+      print('만보기 오류: $error');
     });
   }
 
@@ -74,10 +74,7 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
         title: const Text('걸음 수 초기화'),
         content: const Text('걸음 수를 초기화하시겠습니까?'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
           ElevatedButton(
             onPressed: () {
               _resetSteps();
@@ -92,39 +89,45 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.95),
+        border: Border.all(color: Colors.black.withOpacity(0.4)),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(2, 4)),
+        ],
+      ),
+
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+      child: Row(
+        children: [
+          const SizedBox(width: 40),
+          const Icon(Icons.directions_walk, size: 40, color: Colors.teal),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.directions_walk, size: 30, color: Colors.blueAccent),
-                const SizedBox(width: 12),
-                Text('걸음 수: $_steps', style: const TextStyle(fontSize: 20)),
+                const Text('오늘의 걸음 수', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                const SizedBox(height: 6),
+                Text('$_steps 걸음',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.teal,
+                    )),
               ],
             ),
-            const SizedBox(height: 10),
-            ElevatedButton.icon(
-              onPressed: _showResetConfirmationDialog,
-              icon: const Icon(Icons.refresh),
-              label: const Text('초기화'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-              ),
-            ),
-          ],
-        ),
+          ),
+          IconButton(
+            onPressed: _showResetConfirmationDialog,
+            icon: const Icon(Icons.autorenew, color: Colors.teal),
+            tooltip: '초기화',
+          ),
+        ],
       ),
     );
   }
 }
-
-
