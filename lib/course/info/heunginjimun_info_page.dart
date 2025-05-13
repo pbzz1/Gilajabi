@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import '../tracking/stamp_points.dart';
-import '../tracking/course_tracking_page.dart';
+
+import 'package:gilajabi/course/tracking/stamp_points.dart';
+import 'package:gilajabi/course/tracking/course_tracking_page.dart';
 
 class HeunginjimunInfoPage extends StatefulWidget {
   const HeunginjimunInfoPage({Key? key}) : super(key: key);

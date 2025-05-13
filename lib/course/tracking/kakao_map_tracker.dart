@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'stamp_points.dart';
+
+import 'package:gilajabi/course/tracking/stamp_points.dart';
 
 class KakaoMapTracker extends StatefulWidget {
   final List<Map<String, double>> polylinePoints;

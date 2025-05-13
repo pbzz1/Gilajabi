@@ -6,9 +6,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
-import 'kakao_map_tracker.dart';
-import 'stamp_points.dart';
-import '../../screens/home/home.dart';
+
+import 'package:gilajabi/course/tracking/kakao_map_tracker.dart';
+import 'package:gilajabi/course/tracking/stamp_points.dart';
+import 'package:gilajabi/screens/home/home.dart';
 
 String? globalUserId;
 

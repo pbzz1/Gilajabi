@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // ✅ 추가
+import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import '../providers/app_settings_provider.dart'; // ✅ 추가
-import 'info/baegak_info_page.dart';
-import 'info/naksan_info_page.dart';
-import 'info/heunginjimun_info_page.dart';
-import 'info/namsan_info_page.dart';
-import 'info/sungnyemun_info_page.dart';
-import 'info/inwangsan_info_page.dart';
+
+import 'package:gilajabi/course/info/baegak_info_page.dart';
+import 'package:gilajabi/course/info/naksan_info_page.dart';
+import 'package:gilajabi/course/info/heunginjimun_info_page.dart';
+import 'package:gilajabi/course/info/namsan_info_page.dart';
+import 'package:gilajabi/course/info/sungnyemun_info_page.dart';
+import 'package:gilajabi/course/info/inwangsan_info_page.dart';
+import 'package:gilajabi/providers/app_settings_provider.dart';
 
 class CoursePage extends StatefulWidget {
   const CoursePage({super.key});

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/app_settings_provider.dart';
-import 'terms_page.dart';
+
+import 'package:gilajabi/screens/settings/terms_page.dart';
+import 'package:gilajabi/providers/app_settings_provider.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
