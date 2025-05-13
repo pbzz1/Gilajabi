@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
 import 'package:gilajabi/screens/home/home_tab.dart';
 import 'package:gilajabi/screens//post/post_page.dart';
 import 'package:gilajabi/screens/profile/profile_tab.dart';
-import 'package:gilajabi/providers/app_settings_provider.dart';
-
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key}); // ✅ 넘겨받는 파라미터 제거
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -35,9 +33,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final settings = Provider.of<AppSettingsProvider>(context); // ✅ Provider로 접근
-    final isKoreanMode = settings.isKoreanMode;
-
     return Scaffold(
       appBar: AppBar(
         title: Padding(
@@ -49,24 +44,23 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blueAccent,
-        onTap: _onItemTapped,
+      bottomNavigationBar: ConvexAppBar(
+        style: TabStyle.react, // 또는 fixed, flip, textIn, reactCircle 등
+        backgroundColor: const Color(0xFFD6EDF9), // 하단 배경 (살짝 진한 파우더 블루)
+        activeColor: Colors.blueAccent,           // 선택된 아이템 색상
+        color: Colors.grey,                       // 비선택 아이템 색상
+        elevation: 6,                             // 그림자 깊이
+        initialActiveIndex: _selectedIndex,
         items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home),
-            label: isKoreanMode ? '홈' : 'Home', // ✅ 한영 적용
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.post_add),
-            label: isKoreanMode ? '게시물' : 'Posts', // ✅ 한영 적용
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.person),
-            label: isKoreanMode ? '프로필' : 'Profile', // ✅ 한영 적용
-          ),
+          TabItem(icon: Icons.home, title: ''),   // 라벨 숨김
+          TabItem(icon: Icons.post_add, title: ''),
+          TabItem(icon: Icons.person, title: ''),
         ],
+        onTap: (int index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
       ),
     );
   }

@@ -41,8 +41,46 @@ class MyApp extends StatelessWidget {
         builder: (context, settings, _) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            theme: ThemeData.light(),
-            darkTheme: ThemeData.dark(),
+            theme: ThemeData(
+              scaffoldBackgroundColor: const Color(0xFFE1F5FE), // 전체 배경
+
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Color(0xFFE1F5FE), // AppBar는 조금 더 진하게
+                foregroundColor: Colors.black, // 아이콘, 텍스트 색상
+                elevation: 0.5,
+              ),
+
+              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                backgroundColor: Color(0xFFD0EAF8), // BottomNav는 중간톤
+                selectedItemColor: Colors.blueAccent,
+                unselectedItemColor: Colors.grey,
+                elevation: 8,
+              ),
+
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
+              useMaterial3: true,
+            ),
+
+
+            darkTheme: ThemeData(
+              scaffoldBackgroundColor: const Color(0xFF121212),
+
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Color(0xFF1F1F1F), // 기본보다 약간 밝은 톤
+                foregroundColor: Colors.white,
+              ),
+
+              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                backgroundColor: Color(0xFF1A1A1A),
+                selectedItemColor: Colors.lightBlueAccent,
+                unselectedItemColor: Colors.white60,
+              ),
+
+              colorScheme: const ColorScheme.dark(primary: Colors.lightBlueAccent),
+              useMaterial3: true,
+            ),
+
+
             themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
             home: isFirstLaunch ? const OnboardingPage() : const LoginPage(),
           );
