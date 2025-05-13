@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'myhomepage.dart';
+
+import 'package:gilajabi/screens/home/home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

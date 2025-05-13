@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'package:provider/provider.dart'; // ✅ 추가
-import '../providers/app_settings_provider.dart'; // ✅ 추가
-import 'memo_edit_page.dart';
+import 'package:provider/provider.dart';
+
+import 'package:gilajabi/providers/app_settings_provider.dart';
+import 'package:gilajabi/screens/memo/memo_edit_page.dart';
 
 class Memo {
   String title;

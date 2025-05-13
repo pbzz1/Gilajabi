@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:gilajabi/screens/home_tab.dart';
-import 'package:gilajabi/board/board_page.dart';
-import 'package:gilajabi/screens/profile_tab.dart';
 import 'package:provider/provider.dart';
-import '../providers/app_settings_provider.dart'; // ✅ 추가
+
+import 'package:gilajabi/screens/home/home_tab.dart';
+import 'package:gilajabi/screens//post/post_page.dart';
+import 'package:gilajabi/screens/profile/profile_tab.dart';
+import 'package:gilajabi/providers/app_settings_provider.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key}); // ✅ 넘겨받는 파라미터 제거

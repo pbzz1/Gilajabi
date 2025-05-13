@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../login.dart';
-import 'package:gilajabi/board/liked_posts_page.dart';
-import 'package:gilajabi/board/my_posts_page.dart';
-import '../providers/app_settings_provider.dart';
-import 'package:gilajabi/mypage/my_stamps_page.dart';
+
+import 'package:gilajabi/screens/login.dart';
+import 'package:gilajabi/screens/profile/my_liked_posts_page.dart';
+import 'package:gilajabi/screens/profile/my_posts_page.dart';
+import 'package:gilajabi/screens/profile/my_stamps_page.dart';
+import 'package:gilajabi/providers/app_settings_provider.dart';
 
 class ProfileTab extends StatefulWidget {
   const ProfileTab({super.key}); // ✅ isKoreanMode 삭제
