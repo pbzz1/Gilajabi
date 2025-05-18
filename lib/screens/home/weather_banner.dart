@@ -103,7 +103,7 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
         return Text(error!, style: const TextStyle(fontSize: 16, color: Colors.redAccent));
       }
       if (description == null || temp == null) {
-        return const Text("날씨 정보를 불러오는 중...", style: TextStyle(fontSize: 16));
+        return const Text("날씨 정보를 불러오는 중...", style: TextStyle(fontSize: 16, color: Colors.black));
       }
       return Text(
         "$description / ${temp!.toStringAsFixed(1)}°C",
@@ -139,7 +139,7 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
               Expanded(
                 child: Text(
                   locationName ?? '위치 확인 중...',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
                 ),
               ),
               AnimatedBuilder(

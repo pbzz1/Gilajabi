@@ -237,23 +237,7 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
                       (route) => false,
                 );
               },
-              child: const Text("🏁 코스 종료", style: TextStyle(fontSize: 16)),
-            ),
-          ),
-
-          Positioned(
-            top: 70,
-            right: 20,
-            child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
-            borderRadius: BorderRadius.circular(8),
-          ),
-              child: Text(
-                "${widget.stampPoints.length - remainingStamps.length} / ${widget.stampPoints.length} 스탬프 완료",
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
+              child: const Text("🏁 코스 종료", style: TextStyle(fontSize: 16, color: Colors.white)),
             ),
           ),
 
@@ -261,14 +245,15 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
             top: 20,
             right: 20,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.8),
+                border: Border.all(color: Colors.black.withOpacity(0.4)),
                 borderRadius: BorderRadius.circular(8),
-              ),
+          ),
               child: Text(
-                "다음 경유지까지 ${_distanceToTarget.toStringAsFixed(1)}m",
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                "${widget.stampPoints.length - remainingStamps.length} / ${widget.stampPoints.length} 스탬프 완료",
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
               ),
             ),
           ),

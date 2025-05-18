@@ -110,7 +110,7 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('오늘의 걸음 수', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                const Text('오늘의 걸음 수', style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 6),
                 Text('$_steps 걸음',
                     style: const TextStyle(

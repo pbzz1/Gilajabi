@@ -96,7 +96,7 @@ class _MyStampsPageState extends State<MyStampsPage> with TickerProviderStateMix
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      color: Colors.grey[300],
+                      color: Colors.blueGrey[200],
                       width: double.infinity,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -110,7 +110,7 @@ class _MyStampsPageState extends State<MyStampsPage> with TickerProviderStateMix
                               const SizedBox(width: 8),
                               Text(
                                 course,
-                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                style: const TextStyle(fontSize: 18, color: Colors.black),
                               ),
                             ],
                           ),
