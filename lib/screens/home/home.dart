@@ -39,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
        padding: const EdgeInsets.symmetric(vertical: 8.0), // 위아래 8픽셀 여백
           child: Image.asset(
             'assets/images/Gilajabi_logo.png',
-            height: 40,
+            height: 55,
           ),
         ),
       ),

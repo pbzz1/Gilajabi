@@ -51,13 +51,10 @@ class _ImageBannerState extends State<ImageBanner> {
           return Container(
             margin: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.black.withOpacity(0.4)),
+              borderRadius: BorderRadius.circular(16),
               boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 6,
-                  offset: Offset(2, 4),
-                ),
+                BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(2, 4)),
               ],
             ),
             clipBehavior: Clip.antiAlias,

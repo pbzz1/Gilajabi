@@ -18,13 +18,10 @@ class MenuButtons extends StatelessWidget {
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Colors.white,
+          border: Border.all(color: Colors.black.withOpacity(0.4)),
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 4,
-              offset: Offset(2, 2),
-            ),
+            BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(2, 4)),
           ],
         ),
         child: Column(

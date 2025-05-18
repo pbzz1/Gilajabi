@@ -120,8 +120,13 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
       curve: Curves.easeInOut,
       decoration: BoxDecoration(
         color: getBackgroundColor(temp),
+        border: Border.all(color: Colors.black.withOpacity(0.4)),
         borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(2, 4)),
+        ],
       ),
+
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -174,4 +179,3 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
     );
   }
 }
-

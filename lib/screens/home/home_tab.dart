@@ -23,13 +23,13 @@ class _HomeTabState extends State<HomeTab> {
     return Scaffold(
       body: ListView(
         children: [
-          const SizedBox(height: 16),
+          const SizedBox(height: 15),
           const ImageBanner(), // 이미지 배너
           const SizedBox(height: 15),
           WeatherBanner(), // 날씨 배너
           const SizedBox(height: 15),
           StepCounterBanner(), // 만보기 배너
-          const SizedBox(height: 15),
+          const SizedBox(height: 30),
           const MenuButtons(), // 메뉴 버튼
         ],
       ),
