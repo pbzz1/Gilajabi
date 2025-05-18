@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+
+import 'package:gilajabi/providers/app_settings_provider.dart';
 
 class StepCounterBanner extends StatefulWidget {
   const StepCounterBanner({super.key});
@@ -68,19 +71,27 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
   }
 
   void _showResetConfirmationDialog() {
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context, listen: false).isKoreanMode;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('걸음 수 초기화'),
-        content: const Text('걸음 수를 초기화하시겠습니까?'),
+        title: Text(isKoreanMode ? '걸음 수 초기화' : 'Reset Steps'),
+        content: Text(isKoreanMode ? '걸음 수를 초기화하시겠습니까?' : 'Do you want to reset today\'s steps?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
-          ElevatedButton(
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(isKoreanMode ? '취소' : 'Cancel'),
+          ),
+          TextButton(
             onPressed: () {
               _resetSteps();
               Navigator.pop(context);
             },
-            child: const Text('초기화'),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red, // 글자 빨간색
+            ),
+            child: Text(isKoreanMode ? '초기화' : 'Reset'),
           ),
         ],
       ),
@@ -90,6 +101,7 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context).isKoreanMode;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -111,16 +123,16 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  '오늘의 걸음 수',
-                  style: TextStyle(
+                Text(
+                  isKoreanMode ? '오늘의 걸음 수' : 'Steps Today',
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  '$_steps 걸음',
+                  '$_steps ${isKoreanMode ? '걸음' : 'steps'}',
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -133,11 +145,10 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
           IconButton(
             onPressed: _showResetConfirmationDialog,
             icon: const Icon(Icons.autorenew, color: Colors.teal),
-            tooltip: '초기화',
+            tooltip: isKoreanMode ? '초기화' : 'Reset',
           ),
         ],
       ),
     );
   }
-
 }

@@ -10,7 +10,7 @@ import 'package:gilajabi/providers/app_settings_provider.dart';
 import 'package:gilajabi/screens/post/post_detail_page.dart';
 
 class BoardPage extends StatefulWidget {
-  const BoardPage({super.key}); // ✅ 파라미터 삭제
+  const BoardPage({super.key}); // 파라미터 삭제
 
   @override
   State<BoardPage> createState() => _BoardPageState();

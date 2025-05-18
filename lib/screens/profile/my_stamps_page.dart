@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:provider/provider.dart';
+
+import 'package:gilajabi/providers/app_settings_provider.dart';
 
 class MyStampsPage extends StatefulWidget {
   const MyStampsPage({super.key});
@@ -41,6 +44,7 @@ class _MyStampsPageState extends State<MyStampsPage> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context).isKoreanMode;
     if (userId == null) {
       return const Scaffold(
         body: Center(child: Text('로그인이 필요합니다.')),
@@ -114,10 +118,9 @@ class _MyStampsPageState extends State<MyStampsPage> with TickerProviderStateMix
                               ),
                             ],
                           ),
-                          Text('$percent% 완료'),
+                          Text('$percent% ${isKoreanMode ? '완료' : 'completed'}'),
                         ],
                       ),
-
                     ),
                   ),
                   AnimatedSwitcher(
@@ -133,7 +136,7 @@ class _MyStampsPageState extends State<MyStampsPage> with TickerProviderStateMix
                       children: courseStamps.map((doc) {
                         final data = doc.data() as Map<String, dynamic>;
                         return ListTile(
-                          leading: const Icon(Icons.location_on),
+                          leading: const Icon(Icons.verified),
                           title: Text(data['name'] ?? '스탬프'),
                           subtitle: Text(
                             (data['timestamp'] as Timestamp?)?.toDate().toString().substring(0, 16) ?? '',

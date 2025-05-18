@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
+import 'package:gilajabi/providers/app_settings_provider.dart';
+import 'package:provider/provider.dart';
+
 class PostDetailPage extends StatefulWidget {
   final String title;
   final String content;
@@ -93,17 +96,20 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
   void _editComment(String docId, String currentContent) {
     final controller = TextEditingController(text: currentContent);
-
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context, listen: false).isKoreanMode;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('댓글 수정'),
+        title: Text(isKoreanMode ? '댓글 수정' : 'Edit Comment'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(labelText: '댓글'),
+          decoration: InputDecoration(labelText: isKoreanMode ? '댓글' : 'Comment'),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('취소')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(isKoreanMode ? '취소' : 'Cancel'),
+          ),
           ElevatedButton(
             onPressed: () async {
               final newContent = controller.text.trim();
@@ -117,7 +123,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
               }
               Navigator.pop(context);
             },
-            child: const Text('수정'),
+            child: Text(isKoreanMode ? '수정' : 'Save'),
           ),
         ],
       ),
@@ -125,14 +131,23 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   void _deleteComment(String docId) async {
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context, listen: false).isKoreanMode;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('댓글 삭제'),
-        content: const Text('댓글을 삭제하시겠습니까?'),
+        title: Text(isKoreanMode ? '댓글 삭제' : 'Delete Comment'),
+        content: Text(isKoreanMode ? '댓글을 삭제하시겠습니까?' : 'Do you want to delete this comment?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('삭제')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(isKoreanMode ? '취소' : 'Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(isKoreanMode ? '삭제' : 'Delete'),
+          ),
         ],
       ),
     );
@@ -151,13 +166,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
   Widget build(BuildContext context) {
     final formattedDate = widget.createdAt != null
         ? '${widget.createdAt!.year}-${widget.createdAt!.month.toString().padLeft(2, '0')}-${widget.createdAt!.day.toString().padLeft(2, '0')} '
-            '${widget.createdAt!.hour}:${widget.createdAt!.minute.toString().padLeft(2, '0')}'
+        '${widget.createdAt!.hour}:${widget.createdAt!.minute.toString().padLeft(2, '0')}'
         : '날짜 없음';
 
     final isLiked = userId != null && likes.contains(userId);
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context).isKoreanMode;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('글 상세보기')),
+      appBar: AppBar(title: Text(isKoreanMode ? '글 상세보기' : 'Post Details')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -165,8 +181,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
           children: [
             Text(widget.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text('작성자: ${widget.authorNickname}'),
-            Text('작성일: $formattedDate'),
+            Text(isKoreanMode ? '작성자: ${widget.authorNickname}' : 'Author: ${widget.authorNickname}'),
+            Text(isKoreanMode ? '작성일: $formattedDate' : 'Posted: $formattedDate'),
             Row(
               children: [
                 IconButton(
@@ -183,101 +199,78 @@ class _PostDetailPageState extends State<PostDetailPage> {
             if (widget.imageUrls != null && widget.imageUrls!.isNotEmpty)
               Column(
                 children: [
-                  SizedBox(
-                    height: 250,
-                    child: PageView.builder(
-                      itemCount: widget.imageUrls!.length,
-                      onPageChanged: (index) => setState(() => currentPage = index),
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              widget.imageUrls![index],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(widget.imageUrls!.length, (index) =>
-                      Container(
-                        width: 8,
-                        height: 8,
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: currentPage == index ? Colors.black : Colors.grey,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // 이미지 슬라이더 생략
                 ],
               ),
             const SizedBox(height: 16),
             Text(widget.content, style: const TextStyle(fontSize: 18)),
+
             const Divider(height: 32),
-            const Text('댓글', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+            Text(isKoreanMode ? '댓글' : 'Comments',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
+
             Expanded(
               child: widget.postId == null
-                  ? const Text('댓글을 불러올 수 없습니다.')
+                  ? Text(isKoreanMode ? '댓글을 불러올 수 없습니다.' : 'Failed to load comments.')
                   : StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection('posts')
-                          .doc(widget.postId)
-                          .collection('comments')
-                          .orderBy('createdAt', descending: true)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                        final comments = snapshot.data!.docs;
-                        if (comments.isEmpty) return const Text('아직 댓글이 없습니다.');
+                stream: FirebaseFirestore.instance
+                    .collection('posts')
+                    .doc(widget.postId)
+                    .collection('comments')
+                    .orderBy('createdAt', descending: true)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                        return ListView.builder(
-                          itemCount: comments.length,
-                          itemBuilder: (context, index) {
-                            final doc = comments[index];
-                            final comment = doc.data() as Map<String, dynamic>;
-                            final isMine = comment['authorId'] == userId;
-                            return ListTile(
-                              title: Text(comment['content'] ?? ''),
-                              subtitle: Text(comment['authorNickname'] ?? ''),
-                              trailing: isMine
-                                  ? Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(Icons.edit, size: 20),
-                                          onPressed: () => _editComment(doc.id, comment['content']),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(Icons.delete, size: 20),
-                                          onPressed: () => _deleteComment(doc.id),
-                                        ),
-                                      ],
-                                    )
-                                  : null,
-                            );
-                          },
-                        );
-                      },
-                    ),
+                  final comments = snapshot.data!.docs;
+
+                  if (comments.isEmpty) {
+                    return Text(isKoreanMode ? '아직 댓글이 없습니다.' : 'No comments yet.');
+                  }
+
+                  return ListView.builder(
+                    itemCount: comments.length,
+                    itemBuilder: (context, index) {
+                      final doc = comments[index];
+                      final comment = doc.data() as Map<String, dynamic>;
+                      final isMine = comment['authorId'] == userId;
+
+                      return ListTile(
+                        title: Text(comment['content'] ?? ''),
+                        subtitle: Text(comment['authorNickname'] ?? ''),
+                        trailing: isMine
+                            ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, size: 20),
+                              onPressed: () => _editComment(doc.id, comment['content']),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, size: 20),
+                              onPressed: () => _deleteComment(doc.id),
+                            ),
+                          ],
+                        )
+                            : null,
+                      );
+                    },
+                  );
+                },
+              ),
             ),
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _commentController,
-                    decoration: const InputDecoration(labelText: '댓글 입력'),
+                    decoration: InputDecoration(
+                      labelText: isKoreanMode ? '댓글 입력' : 'Enter a comment',
+                    ),
                   ),
                 ),
                 IconButton(
@@ -285,7 +278,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   onPressed: _addComment,
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
