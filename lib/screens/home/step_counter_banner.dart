@@ -89,17 +89,18 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
+        color: isDarkMode ? Colors.grey[850] : Colors.white,
         border: Border.all(color: Colors.black.withOpacity(0.4)),
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(2, 4)),
         ],
       ),
-
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
       child: Row(
         children: [
@@ -110,14 +111,22 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('오늘의 걸음 수', style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500)),
+                const Text(
+                  '오늘의 걸음 수',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 const SizedBox(height: 6),
-                Text('$_steps 걸음',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.teal,
-                    )),
+                Text(
+                  '$_steps 걸음',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.teal,
+                  ),
+                ),
               ],
             ),
           ),
@@ -130,4 +139,5 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
       ),
     );
   }
+
 }

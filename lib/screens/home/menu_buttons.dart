@@ -10,27 +10,36 @@ class MenuButtons extends StatelessWidget {
   const MenuButtons({super.key});
 
   Widget buildMenuButton(BuildContext context, IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 90,
-        height: 90,
-        margin: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.black.withOpacity(0.4)),
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      width: 90,
+      height: 90,
+      margin: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.grey[850] : Colors.white,
+        border: Border.all(color: Colors.black.withOpacity(0.4)),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(2, 4)),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
-            BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(2, 4)),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 30, color: Colors.black87),
-            const SizedBox(height: 8),
-            Text(label, style: const TextStyle(fontSize: 14, color: Colors.black)),
-          ],
+          onTap: onTap,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 30),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: const TextStyle(fontSize: 14),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -70,6 +79,7 @@ class MenuButtons extends StatelessWidget {
               MaterialPageRoute(builder: (_) => const SettingsPage()),
             );
             if (result == true) {
+              // 설정 변경 후 처리
             }
           },
         ),
