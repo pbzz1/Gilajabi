@@ -115,7 +115,7 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
           targetPoint.longitude,
         );
 
-        setState(() async {
+        setState(() {
           _distanceToTarget = distance;
 
           if (distance <= 30) {
@@ -158,10 +158,13 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
   }
 
   void onReachedTarget() async {
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context, listen: false).isKoreanMode;
     final stamp = targetPoint;
 
     if (globalUserId == null) {
-      Fluttertoast.showToast(msg: "로그인이 필요합니다.");
+      Fluttertoast.showToast(
+        msg: isKoreanMode ? "로그인이 필요합니다." : "Login is required.",
+      );
       return;
     }
 
@@ -173,7 +176,12 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
       lng: stamp.longitude,
     );
 
-    Fluttertoast.showToast(msg: "스탬프 저장 완료!");
+    Fluttertoast.showToast(
+      msg: isKoreanMode
+          ? "스탬프 저장 완료!"
+          : "Stamp saved successfully!",
+    );
+
 
     setState(() {
       remainingStamps.remove(stamp);
@@ -181,11 +189,11 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
       takenNames!.add(stamp.name); // ✅ null 아님 확정
     });
 
-    // ✅ JS에 찍은 스탬프 이름 목록 다시 전달
+    // JS에 찍은 스탬프 이름 목록 다시 전달
     final updatedNames = jsonEncode(takenNames!.toList());
     _mapKey.currentState?.evaluateJavascript("setTakenStampNames($updatedNames);");
 
-    // ✅ 전체 스탬프 마커 다시 그림
+    // 전체 스탬프 마커 다시 그림
     final stampList = widget.stampPoints.map((s) => {
       "name": s.name,
       "lat": s.latitude,
@@ -195,8 +203,12 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
     _mapKey.currentState?.evaluateJavascript("addStampMarkers($jsonStampList);");
 
     if (remainingStamps.isEmpty) {
+      final isKoreanMode = Provider.of<AppSettingsProvider>(context, listen: false).isKoreanMode;
+
       Fluttertoast.showToast(
-        msg: "🎉 모든 경유지 스탬프 완료!",
+        msg: isKoreanMode
+            ? "🎉 모든 경유지 스탬프 완료!"
+            : "🎉 All stamps collected!",
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.CENTER,
       );
@@ -258,6 +270,27 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
           ),
           Positioned(
             top: 20,
+            right: 20,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                border: Border.all(color: Colors.black.withOpacity(0.4)),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                isKoreanMode
+                    ? "다음 경유지까지 ${_distanceToTarget.toStringAsFixed(1)}m"
+                    : "Next stop in ${_distanceToTarget.toStringAsFixed(1)}m",
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black),
+              )
+            ),
+          ),
+          Positioned(
+            top: 70,
             right: 20,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
