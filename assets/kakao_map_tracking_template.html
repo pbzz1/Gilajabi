@@ -28,6 +28,7 @@
           background-color: #ffffffee;
           box-shadow: 0px 3px 6px rgba(0,0,0,0.3);
           cursor: pointer;
+          margin-bottom: 10px;
         }
     </style>
     <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=8d8465643b5de1002ccbe7b3197fd029&autoload=false"></script>
@@ -36,6 +37,7 @@
 <div id="map">
     <div id="button-container">
         <button class="map-button" onclick="moveToUser()">📍 내 위치 보기</button>
+        <button class="map-button" onclick="moveToCourse()">🗺️ 코스 보기</button>
     </div>
 </div>
 
@@ -44,9 +46,9 @@
     let userMarker = null;
     let userLatLng = null;
     let isFollowingUser = true;
+    let savedCourseBounds = null;
     window.flutter_ready = false;
 
-    // ✅ 찍은 스탬프 이름 Set 저장
     let takenStampNames = new Set();
 
     function setTakenStampNames(names) {
@@ -93,6 +95,8 @@
       const bounds = new kakao.maps.LatLngBounds();
       latlngs.forEach(p => bounds.extend(p));
       map.setBounds(bounds);
+
+      savedCourseBounds = bounds; // ✅ 저장
     }
 
     function addStampMarkers(stamps) {
@@ -104,8 +108,8 @@
 
         const markerImage = new kakao.maps.MarkerImage(
           isStamped
-            ? "images/stamp_checked.png"
-            : "images/stamp_unchecked.png",
+            ? "images/stamp/stamp_checked.png"
+            : "images/stamp/stamp_unchecked.png",
           new kakao.maps.Size(40, 40)
         );
 
@@ -156,12 +160,21 @@
         title: '현재 위치',
         image: new kakao.maps.MarkerImage(
           "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-          new kakao.maps.Size(24, 35)
+          new kakao.maps.Size(24, 40)
         )
       });
 
       map.setLevel(2);
       map.panTo(userLatLng);
+    }
+
+    function moveToCourse() {
+      if (savedCourseBounds) {
+        isFollowingUser = false;
+        map.setBounds(savedCourseBounds);
+      } else {
+        alert("코스 정보를 불러오지 못했습니다.");
+      }
     }
 </script>
 </body>

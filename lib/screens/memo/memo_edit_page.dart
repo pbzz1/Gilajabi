@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // ✅ 추가
-import '../providers/app_settings_provider.dart'; // ✅ 추가
-import 'memo_page.dart';
+import 'package:provider/provider.dart';
+
+import 'package:gilajabi/providers/app_settings_provider.dart';
+import 'package:gilajabi/screens/memo/memo_page.dart';
 
 class MemoEditPage extends StatefulWidget {
   final Memo? memo;

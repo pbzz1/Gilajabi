@@ -6,9 +6,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
-import '../../widgets/kakao_map_tracker.dart';
-import '../stamp_points.dart';
-import '../../myhomepage.dart';
+import 'package:provider/provider.dart';
+
+import 'package:gilajabi/course/tracking/kakao_map_tracker.dart';
+import 'package:gilajabi/course/tracking/stamp_points.dart';
+import 'package:gilajabi/screens/home/home.dart';
+import 'package:gilajabi/providers/app_settings_provider.dart';
 
 String? globalUserId;
 
@@ -35,7 +38,7 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
   StreamSubscription<Position>? _positionStream;
   List<PolylinePoint> _polylinePoints = [];
   List<StampPoint> remainingStamps = [];
-  Set<String>? takenNames; // ✅ late 제거, null 허용
+  Set<String>? takenNames;
 
   bool _loading = true;
   bool _followUser = true;
@@ -73,7 +76,7 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
     final takenSet = snapshot.docs.map((doc) => doc['name'] as String).toSet();
 
     setState(() {
-      takenNames = takenSet; // ✅ 초기화
+      takenNames = takenSet; // 초기화
       remainingStamps = widget.stampPoints
           .where((stamp) => !takenSet.contains(stamp.name))
           .toList();
@@ -92,8 +95,9 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
       _loading = false;
     });
   }
-
   void _startTracking() async {
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context, listen: false).isKoreanMode;
+
     final position = await Geolocator.getCurrentPosition();
     _mapKey.currentState?.updateUserLocation(position.latitude, position.longitude);
 
@@ -117,7 +121,12 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
           if (distance <= 30) {
             if (!_canStamp) {
               _canStamp = true;
-              Fluttertoast.showToast(msg: "경유지 도착! 스탬프를 찍어주세요!");
+
+              Fluttertoast.showToast(
+                msg: isKoreanMode
+                    ? "경유지 도착! 스탬프를 찍어주세요!"
+                    : "You’ve reached the stop! Please take a stamp!",
+              );
             }
           } else {
             if (_canStamp) {
@@ -149,10 +158,13 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
   }
 
   void onReachedTarget() async {
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context, listen: false).isKoreanMode;
     final stamp = targetPoint;
 
     if (globalUserId == null) {
-      Fluttertoast.showToast(msg: "로그인이 필요합니다.");
+      Fluttertoast.showToast(
+        msg: isKoreanMode ? "로그인이 필요합니다." : "Login is required.",
+      );
       return;
     }
 
@@ -164,19 +176,24 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
       lng: stamp.longitude,
     );
 
-    Fluttertoast.showToast(msg: "스탬프 저장 완료!");
+    Fluttertoast.showToast(
+      msg: isKoreanMode
+          ? "스탬프 저장 완료!"
+          : "Stamp saved successfully!",
+    );
+
 
     setState(() {
       remainingStamps.remove(stamp);
       _canStamp = false;
-      takenNames!.add(stamp.name); // ✅ null 아님 확정
+      takenNames!.add(stamp.name);
     });
 
-    // ✅ JS에 찍은 스탬프 이름 목록 다시 전달
+    // JS에 찍은 스탬프 이름 목록 다시 전달
     final updatedNames = jsonEncode(takenNames!.toList());
     _mapKey.currentState?.evaluateJavascript("setTakenStampNames($updatedNames);");
 
-    // ✅ 전체 스탬프 마커 다시 그림
+    // 전체 스탬프 마커 다시 그림
     final stampList = widget.stampPoints.map((s) => {
       "name": s.name,
       "lat": s.latitude,
@@ -186,8 +203,12 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
     _mapKey.currentState?.evaluateJavascript("addStampMarkers($jsonStampList);");
 
     if (remainingStamps.isEmpty) {
+      final isKoreanMode = Provider.of<AppSettingsProvider>(context, listen: false).isKoreanMode;
+
       Fluttertoast.showToast(
-        msg: "🎉 모든 경유지 스탬프 완료!",
+        msg: isKoreanMode
+            ? "🎉 모든 경유지 스탬프 완료!"
+            : "🎉 All stamps collected!",
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.CENTER,
       );
@@ -202,7 +223,7 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ takenNames 초기화되지 않았을 경우 로딩 표시
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context).isKoreanMode;
     if (takenNames == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -210,7 +231,13 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('${widget.courseName} 코스 추적')),
+      appBar: AppBar(
+        title: Text(
+          isKoreanMode
+              ? '${widget.courseName} 코스 추적'
+              : 'Tracking ${widget.courseName}',
+        ),
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : Stack(
@@ -235,26 +262,12 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
                       (route) => false,
                 );
               },
-              child: const Text("🏁 코스 종료", style: TextStyle(fontSize: 16)),
-            ),
-          ),
-
-          Positioned(
-            top: 70,
-            right: 20,
-            child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
-            borderRadius: BorderRadius.circular(8),
-          ),
               child: Text(
-                "${widget.stampPoints.length - remainingStamps.length} / ${widget.stampPoints.length} 스탬프 완료",
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                isKoreanMode ? "🏁 코스 종료" : "🏁 End Course",
+                style: const TextStyle(fontSize: 16, color: Colors.white),
               ),
             ),
           ),
-
           Positioned(
             top: 20,
             right: 20,
@@ -262,29 +275,60 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.8),
+                border: Border.all(color: Colors.black.withOpacity(0.4)),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                "다음 경유지까지 ${_distanceToTarget.toStringAsFixed(1)}m",
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                isKoreanMode
+                    ? "다음 경유지까지 ${_distanceToTarget.toStringAsFixed(1)}m"
+                    : "Next stop in ${_distanceToTarget.toStringAsFixed(1)}m",
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black),
+              )
+            ),
+          ),
+          Positioned(
+            top: 70,
+            right: 20,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                border: Border.all(color: Colors.black.withOpacity(0.4)),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                isKoreanMode
+                    ? "${widget.stampPoints.length - remainingStamps.length} / ${widget.stampPoints.length} 스탬프 완료"
+                    : "${widget.stampPoints.length - remainingStamps.length} / ${widget.stampPoints.length} stamps complete",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
               ),
             ),
           ),
           Positioned(
-            bottom: 20,
+            bottom: 70,
             left: 20,
             right: 20,
             child: Visibility(
               visible: _canStamp,
               child: ElevatedButton(
                 onPressed: onReachedTarget,
-                child: const Text("📸 스탬프 찍기"),
+                child: Text(
+                  isKoreanMode ? "📸 스탬프 찍기" : "📸 Take Stamp",
+                ),
               ),
             ),
           ),
         ],
       ),
     );
+
   }
 
   Future<void> saveStamp({

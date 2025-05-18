@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'package:provider/provider.dart'; // ✅ 추가
-import '../providers/app_settings_provider.dart'; // ✅ 추가
-import 'memo_edit_page.dart';
+import 'package:provider/provider.dart';
+
+import 'package:gilajabi/providers/app_settings_provider.dart';
+import 'package:gilajabi/screens/memo/memo_edit_page.dart';
 
 class Memo {
   String title;
@@ -153,10 +154,13 @@ class _MemoPageState extends State<MemoPage> {
           ),
           itemBuilder: (context, index) {
             final memo = _memos[index];
+            final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
             return GestureDetector(
               onTap: () => _navigateToEdit(memo: memo, index: index),
               onLongPress: () => _showDeleteMenu(index),
               child: Card(
+                color: isDarkMode ? Colors.grey[700] : Colors.white, // 배경색 조정
                 elevation: 4,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 child: Padding(
@@ -167,21 +171,29 @@ class _MemoPageState extends State<MemoPage> {
                       Text(
                         memo.title,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode ? Colors.white : Colors.black, // 제목 색상
+                        ),
                       ),
                       const SizedBox(height: 6),
-                      Expanded(
-                        child: Text(
-                          memo.content,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          style: const TextStyle(fontSize: 14, color: Colors.black87),
+                      Text(
+                        memo.content,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isDarkMode ? Colors.white70 : Colors.black87, // 내용 색상
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         '${memo.createdAt.year}.${memo.createdAt.month}.${memo.createdAt.day}',
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDarkMode ? Colors.grey[300] : Colors.grey, // 날짜 색상
+                        ),
                       ),
                     ],
                   ),

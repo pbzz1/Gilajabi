@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'login.dart'; // 시작 후 로그인 화면으로 이동
+
+import 'package:gilajabi/screens/login.dart'; // 시작 후 로그인 화면으로 이동
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -15,17 +16,17 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   final List<Map<String, String>> _pages = [
     {
-      "image": "assets/images/onboarding_resized1.png",
+      "image": "assets/images/onboarding/onboarding_resized1.png",
       "title": "한양도성 탐방 안내",
       "desc": "서울의 역사를 따라 걷는\n한양도성 길라잡이 앱입니다.",
     },
     {
-      "image": "assets/images/onboarding_resized2.png",
+      "image": "assets/images/onboarding/onboarding_resized2.png",
       "title": "코스 정보 제공",
       "desc": "6개 구간의 문화정보와\n경로를 쉽게 확인하세요.",
     },
     {
-      "image": "assets/images/onboarding_resized3.png",
+      "image": "assets/images/onboarding/onboarding_resized3.png",
       "title": "게시판과 소통",
       "desc": "후기와 꿀팁을 공유하고\n다른 이용자들과 소통해보세요.",
     },

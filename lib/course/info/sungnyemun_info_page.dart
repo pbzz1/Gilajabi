@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import '../stamp_points.dart';
-import '../tracking/course_tracking_page.dart';
+
+import 'package:gilajabi/course/tracking/stamp_points.dart';
+import 'package:gilajabi/course/tracking/course_tracking_page.dart';
 
 class SungnyemunInfoPage extends StatefulWidget {
   const SungnyemunInfoPage({Key? key}) : super(key: key);
@@ -36,20 +37,30 @@ class _SungnyemunInfoPageState extends State<SungnyemunInfoPage> {
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => CourseTrackingPage(
-                      courseName: '5코스 숭례문구간',
-                      polylineJsonFile: 'sungnyemun_path.json', // ✅ 여기를 JSON 파일명으로 변경
-                      stampPoints: sungnyemunStampPoints, // ✅ stamp_points.dart에서 불러온 리스트
-                    ),
+            child: Builder(
+              builder: (context) {
+                final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+                return ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isDarkMode ? Colors.grey : Theme.of(context).primaryColor,
+                    foregroundColor: isDarkMode ? Colors.black : Colors.white,
+                    textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CourseTrackingPage(
+                          courseName: '5코스 숭례문구간',
+                          polylineJsonFile: 'sungnyemun_path.json',
+                          stampPoints: sungnyemunStampPoints,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text("이 코스 선택"),
                 );
               },
-              child: const Text("이 코스 선택"),
             ),
           )
         ],

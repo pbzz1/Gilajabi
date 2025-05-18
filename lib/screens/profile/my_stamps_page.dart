@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:provider/provider.dart';
+
+import 'package:gilajabi/providers/app_settings_provider.dart';
 
 class MyStampsPage extends StatefulWidget {
   const MyStampsPage({super.key});
@@ -9,11 +12,10 @@ class MyStampsPage extends StatefulWidget {
   State<MyStampsPage> createState() => _MyStampsPageState();
 }
 
-class _MyStampsPageState extends State<MyStampsPage> {
+class _MyStampsPageState extends State<MyStampsPage> with TickerProviderStateMixin {
   String? userId;
-  Map<String, bool> expandedCourses = {}; // ✅ 접힘 상태 관리
+  Map<String, bool> expandedCourses = {};
 
-  // ✅ 각 코스의 전체 스탬프 수 정의 (수동 설정)
   final Map<String, int> totalStampsPerCourse = {
     '백악': 3,
     '낙산': 3,
@@ -42,6 +44,7 @@ class _MyStampsPageState extends State<MyStampsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context).isKoreanMode;
     if (userId == null) {
       return const Scaffold(
         body: Center(child: Text('로그인이 필요합니다.')),
@@ -70,7 +73,6 @@ class _MyStampsPageState extends State<MyStampsPage> {
             return const Center(child: Text('아직 찍은 스탬프가 없습니다.'));
           }
 
-          // ✅ 코스별로 그룹화
           final Map<String, List<QueryDocumentSnapshot>> courseGroups = {};
           for (var doc in stamps) {
             final data = doc.data() as Map<String, dynamic>;
@@ -93,36 +95,57 @@ class _MyStampsPageState extends State<MyStampsPage> {
                   InkWell(
                     onTap: () {
                       setState(() {
-                        expandedCourses[course] = !(expandedCourses[course] ?? true);
+                        expandedCourses[course] = !isExpanded;
                       });
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      color: Colors.grey[300],
+                      color: Colors.blueGrey[200],
                       width: double.infinity,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            course,
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          Row(
+                            children: [
+                              Icon(
+                                isExpanded ? Icons.expand_less : Icons.expand_more,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                course,
+                                style: const TextStyle(fontSize: 18, color: Colors.black),
+                              ),
+                            ],
                           ),
-                          Text('$percent% 완료'),
+                          Text('$percent% ${isKoreanMode ? '완료' : 'completed'}'),
                         ],
                       ),
                     ),
                   ),
-                  if (isExpanded)
-                    ...courseStamps.map((doc) {
-                      final data = doc.data() as Map<String, dynamic>;
-                      return ListTile(
-                        leading: const Icon(Icons.location_on),
-                        title: Text(data['name'] ?? '스탬프'),
-                        subtitle: Text(
-                          (data['timestamp'] as Timestamp?)?.toDate().toString().substring(0, 16) ?? '',
-                        ),
-                      );
-                    }).toList(),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    transitionBuilder: (child, animation) => SizeTransition(
+                      sizeFactor: animation,
+                      axisAlignment: -1.0,
+                      child: child,
+                    ),
+                    child: isExpanded
+                        ? Column(
+                      key: ValueKey(true),
+                      children: courseStamps.map((doc) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        return ListTile(
+                          leading: const Icon(Icons.verified),
+                          title: Text(data['name'] ?? '스탬프'),
+                          subtitle: Text(
+                            (data['timestamp'] as Timestamp?)?.toDate().toString().substring(0, 16) ?? '',
+                          ),
+                        );
+                      }).toList(),
+                    )
+                        : const SizedBox.shrink(key: ValueKey(false)),
+                  ),
                 ],
               );
             }).toList(),

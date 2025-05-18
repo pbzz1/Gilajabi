@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'post_detail_page.dart';
+
+import 'package:gilajabi/screens/post/post_detail_page.dart';
 
 class LikedPostsPage extends StatelessWidget {
   final String userId;

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'myhomepage.dart';
+
+import 'package:gilajabi/screens/home/home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -21,8 +22,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     _controller = AnimationController(
       duration: const Duration(seconds: 10),
       vsync: this,
-    )..repeat(reverse: true); // 반복 + 반대로 (줌 인 ➔ 줌 아웃)
-
+    )..repeat(reverse: true);
     _animation = Tween<double>(begin: 1.0, end: 1.1).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
@@ -75,7 +75,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const MyHomePage(), // ✅ 여기 깔끔하게 수정
+            builder: (context) => const MyHomePage(),
           ),
         );
       }

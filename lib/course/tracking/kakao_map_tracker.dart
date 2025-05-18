@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import '../course/stamp_points.dart';
+
+import 'package:gilajabi/course/tracking/stamp_points.dart';
 
 class KakaoMapTracker extends StatefulWidget {
   final List<Map<String, double>> polylinePoints;
@@ -36,15 +37,15 @@ class KakaoMapTrackerState extends State<KakaoMapTracker> {
         _webViewController = controller;
         await _waitForMapReady();
 
-        // ✅ 1. 찍은 스탬프 목록 전달
+        // 찍은 스탬프 목록 전달
         final takenJson = jsonEncode(widget.takenStampNames.toList());
         await controller.evaluateJavascript(source: "setTakenStampNames($takenJson);");
 
-        // ✅ 2. 폴리라인 표시
+        // 폴리라인 표시
         final polylineJson = jsonEncode(widget.polylinePoints);
         await controller.evaluateJavascript(source: "drawPolyline($polylineJson);");
 
-        // ✅ 3. 스탬프 마커 표시 (색상 구분 포함)
+        // 스탬프 마커 표시 (색상 구분 포함)
         final stampJson = jsonEncode(widget.stampPoints.map((e) => {
           "name": e.name,
           "lat": e.latitude,

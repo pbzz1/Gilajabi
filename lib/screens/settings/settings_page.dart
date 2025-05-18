@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/app_settings_provider.dart';
-import 'terms_page.dart';
+
+import 'package:gilajabi/screens/settings/terms_page.dart';
+import 'package:gilajabi/providers/app_settings_provider.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -26,18 +27,18 @@ class SettingsPage extends StatelessWidget {
         children: [
           SwitchListTile(
             secondary: const Icon(Icons.language),
-            title: Text(isKoreanMode ? '한영 모드' : 'Language Mode'),
-            subtitle: Text(isKoreanMode ? '영어 모드' : 'English Mode'),
-            value: isKoreanMode,
+            title: Text(isKoreanMode ? '언어' : 'Language'),
+            subtitle: Text(isKoreanMode ? '한글' : 'English'),
+            value: !isKoreanMode,
             onChanged: (bool value) {
-              settings.toggleKoreanMode(value);
+              settings.toggleKoreanMode(!value);
             },
           ),
           SwitchListTile(
             secondary: const Icon(Icons.dark_mode),
             title: Text(isKoreanMode ? '다크 모드' : 'Dark Mode'),
             subtitle: Text(isDarkMode
-                ? (isKoreanMode ? '다크 모드' : 'Dark Mode')
+                ? (isKoreanMode ? '화면 모드' : 'Dark Mode')
                 : (isKoreanMode ? '라이트 모드' : 'Light Mode')),
             value: isDarkMode,
             onChanged: (bool value) {
