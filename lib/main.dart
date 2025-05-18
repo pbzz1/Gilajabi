@@ -25,8 +25,8 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   final isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
 
-  runApp(MyApp(isFirstLaunch: isFirstLaunch));
-  //runApp(const MyApp(isFirstLaunch: true)); // 💡 테스트용 강제 설정
+  //runApp(MyApp(isFirstLaunch: isFirstLaunch));
+  runApp(const MyApp(isFirstLaunch: true)); // 테스트용 강제 설정
 }
 
 class MyApp extends StatelessWidget {

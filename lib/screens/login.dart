@@ -22,8 +22,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     _controller = AnimationController(
       duration: const Duration(seconds: 10),
       vsync: this,
-    )..repeat(reverse: true); // 반복 + 반대로 (줌 인 ➔ 줌 아웃)
-
+    )..repeat(reverse: true);
     _animation = Tween<double>(begin: 1.0, end: 1.1).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
@@ -76,7 +75,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const MyHomePage(), // ✅ 여기 깔끔하게 수정
+            builder: (context) => const MyHomePage(),
           ),
         );
       }

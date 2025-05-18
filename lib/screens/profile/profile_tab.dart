@@ -10,7 +10,7 @@ import 'package:gilajabi/screens/profile/my_stamps_page.dart';
 import 'package:gilajabi/providers/app_settings_provider.dart';
 
 class ProfileTab extends StatefulWidget {
-  const ProfileTab({super.key}); // ✅ isKoreanMode 삭제
+  const ProfileTab({super.key});
 
   @override
   State<ProfileTab> createState() => _ProfileTabState();
@@ -149,7 +149,7 @@ class _ProfileTabState extends State<ProfileTab> {
 
   @override
   Widget build(BuildContext context) {
-    final settings = Provider.of<AppSettingsProvider>(context); // ✅ Provider로 가져오기
+    final settings = Provider.of<AppSettingsProvider>(context);
     final isKoreanMode = settings.isKoreanMode;
 
     return Scaffold(
@@ -195,7 +195,7 @@ class _ProfileTabState extends State<ProfileTab> {
             onTap: _onLikedPostsPressed,
           ),
           ListTile(
-            leading: const Icon(Icons.map_outlined),
+            leading: const Icon(Icons.verified),
             title: Text( isKoreanMode ? '내 스탬프 보기' : 'My Stamps'),
             onTap: _onMyStampsPressed,
           ),

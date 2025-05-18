@@ -10,7 +10,7 @@ import 'package:gilajabi/providers/app_settings_provider.dart';
 import 'package:gilajabi/screens/post/post_detail_page.dart';
 
 class BoardPage extends StatefulWidget {
-  const BoardPage({super.key}); // 파라미터 삭제
+  const BoardPage({super.key});
 
   @override
   State<BoardPage> createState() => _BoardPageState();
@@ -63,7 +63,7 @@ class _BoardPageState extends State<BoardPage> {
 
   @override
   Widget build(BuildContext context) {
-    final settings = Provider.of<AppSettingsProvider>(context); // ✅ Provider 사용
+    final settings = Provider.of<AppSettingsProvider>(context);
     final isKoreanMode = settings.isKoreanMode;
 
     return Scaffold(

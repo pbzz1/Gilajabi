@@ -186,7 +186,7 @@ class _CourseTrackingPageState extends State<CourseTrackingPage> {
     setState(() {
       remainingStamps.remove(stamp);
       _canStamp = false;
-      takenNames!.add(stamp.name); // ✅ null 아님 확정
+      takenNames!.add(stamp.name);
     });
 
     // JS에 찍은 스탬프 이름 목록 다시 전달

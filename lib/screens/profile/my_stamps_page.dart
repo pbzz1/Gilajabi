@@ -14,7 +14,7 @@ class MyStampsPage extends StatefulWidget {
 
 class _MyStampsPageState extends State<MyStampsPage> with TickerProviderStateMixin {
   String? userId;
-  Map<String, bool> expandedCourses = {}; // ✅ 접힘 상태 관리
+  Map<String, bool> expandedCourses = {};
 
   final Map<String, int> totalStampsPerCourse = {
     '백악': 3,

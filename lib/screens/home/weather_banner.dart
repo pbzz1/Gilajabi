@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:provider/provider.dart';
+
+import 'package:gilajabi/providers/app_settings_provider.dart';
 
 class WeatherBanner extends StatefulWidget {
   const WeatherBanner({super.key});
@@ -37,6 +40,8 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
   }
 
   Future<void> _loadWeather() async {
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context, listen: false).isKoreanMode;
+
     setState(() {
       isLoading = true;
       error = null;
@@ -50,7 +55,9 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
       }
 
       if (!serviceEnabled || permission == LocationPermission.deniedForever) {
-        setState(() => error = "위치 권한이 거부되었습니다.");
+        setState(() => error = isKoreanMode
+            ? "위치 권한이 거부되었습니다."
+            : "Location permission denied.");
         return;
       }
 
@@ -69,7 +76,9 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
 
       final response = await http.get(url);
       if (response.statusCode != 200) {
-        setState(() => error = "API 오류: ${response.statusCode}");
+        setState(() => error = isKoreanMode
+            ? "API 오류: ${response.statusCode}"
+            : "API error: ${response.statusCode}");
         return;
       }
 
@@ -82,7 +91,9 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
       });
     } catch (e) {
       setState(() {
-        error = "날씨 정보를 불러오지 못했습니다.";
+        error = isKoreanMode
+            ? "날씨 정보를 불러오지 못했습니다."
+            : "Failed to load weather information.";
         isLoading = false;
       });
     }
@@ -98,16 +109,20 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    final isKoreanMode = Provider.of<AppSettingsProvider>(context).isKoreanMode;
     final infoText = () {
       if (error != null) {
         return Text(error!, style: const TextStyle(fontSize: 16, color: Colors.redAccent));
       }
       if (description == null || temp == null) {
-        return const Text("날씨 정보를 불러오는 중...", style: TextStyle(fontSize: 16, color: Colors.black));
+        return Text(
+          isKoreanMode ? "날씨 정보를 불러오는 중..." : "Loading weather info...",
+          style: const TextStyle(fontSize: 16, color: Colors.black),
+        );
       }
       return Text(
         "$description / ${temp!.toStringAsFixed(1)}°C",
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: Colors.black87,
@@ -138,8 +153,8 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  locationName ?? '위치 확인 중...',
-                  style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
+                  locationName ?? (isKoreanMode ? '위치 확인 중...' : 'Locating...'),
+                  style: const TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
                 ),
               ),
               AnimatedBuilder(
