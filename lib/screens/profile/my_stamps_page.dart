@@ -17,12 +17,12 @@ class _MyStampsPageState extends State<MyStampsPage> with TickerProviderStateMix
   Map<String, bool> expandedCourses = {};
 
   final Map<String, int> totalStampsPerCourse = {
-    '백악': 3,
-    '낙산': 3,
-    '흥인지문': 3,
-    '남산': 3,
-    '숭례문': 3,
-    '인왕산': 3,
+    '1코스 백악구간': 3,
+    '2코스 낙산구간': 3,
+    '3코스 흥인지문구간': 3,
+    '4코스 남산구간': 3,
+    '5코스 숭례문구간': 3,
+    '6코스 인왕산구간': 3,
   };
 
   @override

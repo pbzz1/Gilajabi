@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:provider/provider.dart';
-
 import 'package:gilajabi/providers/app_settings_provider.dart';
 
 class WeatherBanner extends StatefulWidget {
@@ -42,6 +41,7 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
   Future<void> _loadWeather() async {
     final isKoreanMode = Provider.of<AppSettingsProvider>(context, listen: false).isKoreanMode;
 
+    if (!mounted) return;
     setState(() {
       isLoading = true;
       error = null;
@@ -55,6 +55,7 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
       }
 
       if (!serviceEnabled || permission == LocationPermission.deniedForever) {
+        if (!mounted) return;
         setState(() => error = isKoreanMode
             ? "위치 권한이 거부되었습니다."
             : "Location permission denied.");
@@ -69,13 +70,14 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
       final placemark = placemarks.first;
       locationName = "${placemark.administrativeArea ?? ''} ${placemark.locality ?? ''} ${placemark.subLocality ?? ''}".trim();
 
-      final apiKey = '37b530c875ea7fa6fc68a929423bcf0a'; // Replace with your real API key
+      final apiKey = '37b530c875ea7fa6fc68a929423bcf0a'; // 실사용 시 보안 처리 요망
       final url = Uri.parse(
         'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey&units=metric&lang=kr',
       );
 
       final response = await http.get(url);
       if (response.statusCode != 200) {
+        if (!mounted) return;
         setState(() => error = isKoreanMode
             ? "API 오류: ${response.statusCode}"
             : "API error: ${response.statusCode}");
@@ -83,6 +85,7 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
       }
 
       final data = jsonDecode(response.body);
+      if (!mounted) return;
       setState(() {
         description = data['weather'][0]['description'];
         iconCode = data['weather'][0]['icon'];
@@ -90,6 +93,7 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
         isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         error = isKoreanMode
             ? "날씨 정보를 불러오지 못했습니다."
@@ -141,7 +145,6 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
           BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(2, 4)),
         ],
       ),
-
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       padding: const EdgeInsets.all(16),
       child: Column(
