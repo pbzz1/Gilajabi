@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
+import 'package:permission_handler/permission_handler.dart'; // ✅ 추가
 
 import 'package:gilajabi/providers/app_settings_provider.dart';
 
@@ -21,7 +22,15 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
   @override
   void initState() {
     super.initState();
-    _startListening();
+    _requestPermissionAndStart(); // ✅ 퍼미션 요청 후 리스닝 시작
+  }
+
+  Future<void> _requestPermissionAndStart() async {
+    var status = await Permission.activityRecognition.status;
+    if (!status.isGranted) {
+      await Permission.activityRecognition.request();
+    }
+    _startListening(); // ✅ 퍼미션 확인 후 스트림 시작
   }
 
   Future<void> _syncTodaySteps() async {
@@ -46,6 +55,7 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
     _stepCountStream?.listen((StepCount event) async {
       _latestDeviceSteps = event.steps;
       await _syncTodaySteps();
+      if (!mounted) return;
       setState(() {
         _steps = _latestDeviceSteps - _baseDeviceSteps;
         if (_steps < 0) _steps = 0;
@@ -64,6 +74,7 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
     await prefs.setInt('baseDeviceSteps', lastDeviceSteps);
     await prefs.setString('lastStepResetDate', today.toIso8601String());
 
+    if (!mounted) return;
     setState(() {
       _baseDeviceSteps = lastDeviceSteps;
       _steps = 0;
@@ -89,7 +100,7 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
               Navigator.pop(context);
             },
             style: TextButton.styleFrom(
-              foregroundColor: Colors.red, // 글자 빨간색
+              foregroundColor: Colors.red,
             ),
             child: Text(isKoreanMode ? '초기화' : 'Reset'),
           ),
