@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
-
 import 'package:gilajabi/providers/app_settings_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -42,14 +41,14 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   Future<void> _loadUserInfo() async {
-  try {
-    final user = await UserApi.instance.me();
-    userId = user.id.toString();
+    try {
+      final user = await UserApi.instance.me();
+      userId = user.id.toString();
 
-    final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
-    setState(() {
-      nickname = doc.data()?['nickname'] ?? '사용자';
-    });
+      final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+      setState(() {
+        nickname = doc.data()?['nickname'] ?? '사용자';
+      });
     } catch (e) {
       print('사용자 정보 로딩 실패: $e');
     }
@@ -196,27 +195,36 @@ class _PostDetailPageState extends State<PostDetailPage> {
               ],
             ),
             const Divider(height: 32),
-            if (widget.imageUrls != null && widget.imageUrls!.isNotEmpty)
-              if (widget.imageUrls != null && widget.imageUrls!.isNotEmpty)
-                SizedBox(
-                  height: 200,
-                  child: PageView.builder(
-                    itemCount: widget.imageUrls!.length,
-                    controller: PageController(viewportFraction: 0.9),
-                    onPageChanged: (index) {
-                      setState(() {
-                        currentPage = index;
-                      });
-                    },
-                    itemBuilder: (context, index) {
-                      final imageUrl = widget.imageUrls![index];
-                      return Padding(
+
+            if (widget.imageUrls != null && widget.imageUrls!.isNotEmpty) ...[
+              SizedBox(
+                height: 200,
+                child: PageView.builder(
+                  itemCount: widget.imageUrls!.length,
+                  controller: PageController(viewportFraction: 0.9),
+                  onPageChanged: (index) {
+                    setState(() {
+                      currentPage = index;
+                    });
+                  },
+                  itemBuilder: (context, index) {
+                    final imageUrl = widget.imageUrls![index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => FullscreenImagePage(imageUrl: imageUrl),
+                          ),
+                        );
+                      },
+                      child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: Image.network(
                             imageUrl,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain, // 또는 BoxFit.fitWidth,
                             width: double.infinity,
                             loadingBuilder: (context, child, progress) {
                               if (progress == null) return child;
@@ -227,19 +235,34 @@ class _PostDetailPageState extends State<PostDetailPage> {
                             },
                           ),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
+              ),
+              if (widget.imageUrls!.length > 1)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(widget.imageUrls!.length, (index) {
+                    return Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                      width: currentPage == index ? 12 : 8,
+                      height: currentPage == index ? 12 : 8,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: currentPage == index ? Colors.blueAccent : Colors.grey,
+                      ),
+                    );
+                  }),
+                ),
+            ],
+
             const SizedBox(height: 16),
             Text(widget.content, style: const TextStyle(fontSize: 18)),
-
             const Divider(height: 32),
-
             Text(isKoreanMode ? '댓글' : 'Comments',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-
             Expanded(
               child: widget.postId == null
                   ? Text(isKoreanMode ? '댓글을 불러올 수 없습니다.' : 'Failed to load comments.')
@@ -309,6 +332,41 @@ class _PostDetailPageState extends State<PostDetailPage> {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ✅ 전체화면 이미지 보기
+class FullscreenImagePage extends StatelessWidget {
+  final String imageUrl;
+
+  const FullscreenImagePage({super.key, required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+      ),
+      body: Center(
+        child: InteractiveViewer(
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.contain,
+            width: double.infinity,
+            height: double.infinity,
+            loadingBuilder: (context, child, progress) {
+              if (progress == null) return child;
+              return const Center(child: CircularProgressIndicator());
+            },
+            errorBuilder: (context, error, stackTrace) {
+              return const Center(child: Icon(Icons.broken_image, size: 48, color: Colors.white));
+            },
+          ),
         ),
       ),
     );
