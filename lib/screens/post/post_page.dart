@@ -242,21 +242,37 @@ class _BoardPageState extends State<BoardPage> {
                   onPressed: isUploading
                       ? null
                       : () async {
-                          setState(() => isUploading = true);
-                          final urls = await _pickAndUploadImages();
-                          if (context.mounted) {
-                            setState(() {
-                              uploadedImageUrls = urls;
-                              isUploading = false;
-                            });
-                          }
-                        },
+                    setState(() => isUploading = true);
+                    try {
+                      final urls = await _pickAndUploadImages();
+                      if (context.mounted) {
+                        setState(() {
+                          uploadedImageUrls = urls;
+                        });
+                      }
+                    } catch (e) {
+                      debugPrint('이미지 업로드 중 오류 발생: $e');
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(isKoreanMode
+                                ? '이미지 업로드에 실패했습니다.'
+                                : 'Failed to upload images.'),
+                          ),
+                        );
+                      }
+                    } finally {
+                      if (context.mounted) {
+                        setState(() => isUploading = false);
+                      }
+                    }
+                  },
                   child: isUploading
                       ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
                       : Text(isKoreanMode ? '이미지 업로드' : 'Upload Images'),
                 ),
                 if (uploadedImageUrls.isNotEmpty)
