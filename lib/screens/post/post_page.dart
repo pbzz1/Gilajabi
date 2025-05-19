@@ -280,7 +280,13 @@ class _BoardPageState extends State<BoardPage> {
 
           if (title.isEmpty || content.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('제목과 내용을 모두 입력해 주세요')),
+              SnackBar(
+                content: Text(
+                  isKoreanMode
+                      ? '제목과 내용을 모두 입력해 주세요'
+                      : 'Please enter both title and content',
+                ),
+              ),
             );
             return;
           }

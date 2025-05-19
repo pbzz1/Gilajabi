@@ -143,7 +143,7 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
       ),
 
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -175,7 +175,7 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

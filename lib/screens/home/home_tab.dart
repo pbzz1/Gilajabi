@@ -29,7 +29,7 @@ class _HomeTabState extends State<HomeTab> {
           WeatherBanner(), // 날씨 배너
           const SizedBox(height: 15),
           StepCounterBanner(), // 만보기 배너
-          const SizedBox(height: 30),
+          const SizedBox(height: 15),
           const MenuButtons(), // 메뉴 버튼
         ],
       ),
