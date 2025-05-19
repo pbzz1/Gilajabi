@@ -51,12 +51,19 @@ class _BoardPageState extends State<BoardPage> {
 
     List<String> urls = [];
     for (var pickedFile in pickedFiles) {
-      final file = File(pickedFile.path);
-      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      final ref = FirebaseStorage.instance.ref().child('post_images/$fileName.jpg');
-      await ref.putFile(file);
-      final url = await ref.getDownloadURL();
-      urls.add(url);
+      try {
+        final file = File(pickedFile.path);
+        final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+        final ref = FirebaseStorage.instance.ref().child('post_images/$fileName.jpg');
+
+        final metadata = SettableMetadata(contentType: 'image/jpeg'); // ✅ 메타데이터 명시
+        await ref.putFile(file, metadata);
+
+        final url = await ref.getDownloadURL();
+        urls.add(url);
+      } catch (e) {
+        debugPrint("이미지 업로드 실패: $e");
+      }
     }
     return urls;
   }

@@ -197,11 +197,40 @@ class _PostDetailPageState extends State<PostDetailPage> {
             ),
             const Divider(height: 32),
             if (widget.imageUrls != null && widget.imageUrls!.isNotEmpty)
-              Column(
-                children: [
-                  // 이미지 슬라이더 생략
-                ],
-              ),
+              if (widget.imageUrls != null && widget.imageUrls!.isNotEmpty)
+                SizedBox(
+                  height: 200,
+                  child: PageView.builder(
+                    itemCount: widget.imageUrls!.length,
+                    controller: PageController(viewportFraction: 0.9),
+                    onPageChanged: (index) {
+                      setState(() {
+                        currentPage = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      final imageUrl = widget.imageUrls![index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            loadingBuilder: (context, child, progress) {
+                              if (progress == null) return child;
+                              return const Center(child: CircularProgressIndicator());
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Center(child: Icon(Icons.broken_image, size: 48));
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
             const SizedBox(height: 16),
             Text(widget.content, style: const TextStyle(fontSize: 18)),
 
