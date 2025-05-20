@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:gilajabi/screens/login.dart';
 import 'package:gilajabi/screens/profile/my_liked_posts_page.dart';
@@ -133,19 +134,25 @@ class _ProfileTabState extends State<ProfileTab> {
   }
 
   void _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userId'); // 자동 로그인 정보 제거
+
     try {
       await UserApi.instance.logout();
-      print('로그아웃 성공');
-      if (context.mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginPage()),
-        );
-      }
+      print('카카오 로그아웃 성공');
     } catch (error) {
-      print('로그아웃 실패: $error');
+      print('카카오 로그아웃 실패: $error');
+    }
+
+    if (context.mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+            (route) => false,
+      );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

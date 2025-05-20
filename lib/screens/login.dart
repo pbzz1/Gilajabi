@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:gilajabi/screens/home/home.dart';
 
@@ -72,6 +73,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       }
 
       if (context.mounted) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('userId', userId); // 자동 로그인 정보 저장
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

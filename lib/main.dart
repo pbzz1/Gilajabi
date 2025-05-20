@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'package:gilajabi/providers/app_settings_provider.dart';
 import 'package:gilajabi/screens/login.dart';
+import 'package:gilajabi/screens/home/home.dart';
 import 'package:gilajabi/screens/onboarding_page.dart';
 
 void main() async {
@@ -24,14 +25,23 @@ void main() async {
   // SharedPreferences에서 온보딩 여부 확인
   final prefs = await SharedPreferences.getInstance();
   final isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
+  final savedUserId = prefs.getString('userId'); // 자동 로그인 여부 확인
 
-  //runApp(MyApp(isFirstLaunch: isFirstLaunch));
-  runApp(const MyApp(isFirstLaunch: true)); // 테스트용 강제 설정
+  runApp(MyApp(
+    isFirstLaunch: isFirstLaunch,
+    isLoggedIn: savedUserId != null, // 로그인 여부에 따라 화면 결정
+  ));
+  //runApp(const MyApp(isFirstLaunch: true)); // 테스트용 강제 설정
 }
 
 class MyApp extends StatelessWidget {
   final bool isFirstLaunch;
-  const MyApp({super.key, required this.isFirstLaunch});
+  final bool isLoggedIn;
+  const MyApp({
+    super.key,
+    required this.isFirstLaunch,
+    required this.isLoggedIn,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +73,11 @@ class MyApp extends StatelessWidget {
             ),
 
             themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-            home: isFirstLaunch ? const OnboardingPage() : const LoginPage(),
+            home: isFirstLaunch
+                ? const OnboardingPage()
+                : isLoggedIn
+                ? const MyHomePage()
+                : const LoginPage(),
           );
         },
       ),
