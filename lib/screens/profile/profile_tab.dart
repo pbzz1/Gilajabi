@@ -135,7 +135,8 @@ class _ProfileTabState extends State<ProfileTab> {
 
   void _logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('userId'); // 자동 로그인 정보 제거
+    await prefs.remove('userId'); // 자동 로그인 해제
+    await prefs.setBool('isFirstLaunch', false); // 필요시 초기화
 
     try {
       await UserApi.instance.logout();
@@ -152,7 +153,6 @@ class _ProfileTabState extends State<ProfileTab> {
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {

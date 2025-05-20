@@ -27,11 +27,8 @@ void main() async {
   final isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
   final savedUserId = prefs.getString('userId'); // 자동 로그인 여부 확인
 
-  runApp(MyApp(
-    isFirstLaunch: isFirstLaunch,
-    isLoggedIn: savedUserId != null, // 로그인 여부에 따라 화면 결정
-  ));
-  //runApp(const MyApp(isFirstLaunch: true)); // 테스트용 강제 설정
+  runApp(MyApp(isFirstLaunch: isFirstLaunch, isLoggedIn: savedUserId != null,));
+  //runApp(MyApp(isFirstLaunch: true, isLoggedIn: savedUserId != null,)); // 테스트용 onbarding 강제 설정
 }
 
 class MyApp extends StatelessWidget {

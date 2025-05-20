@@ -49,16 +49,30 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
 
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        setState(() => error = isKoreanMode
+            ? "위치 서비스가 꺼져 있습니다. 설정에서 활성화해 주세요."
+            : "Location services are disabled.");
+        return;
+      }
+
       LocationPermission permission = await Geolocator.checkPermission();
+
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
       }
 
-      if (!serviceEnabled || permission == LocationPermission.deniedForever) {
-        if (!mounted) return;
+      if (permission == LocationPermission.denied) {
         setState(() => error = isKoreanMode
             ? "위치 권한이 거부되었습니다."
-            : "Location permission denied.");
+            : "Location permission was denied.");
+        return;
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        setState(() => error = isKoreanMode
+            ? "위치 권한이 영구적으로 거부되었습니다.\n설정에서 수동으로 허용해 주세요."
+            : "Location permission permanently denied.\nPlease enable it in settings.");
         return;
       }
 
@@ -70,22 +84,20 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
       final placemark = placemarks.first;
       locationName = "${placemark.administrativeArea ?? ''} ${placemark.locality ?? ''} ${placemark.subLocality ?? ''}".trim();
 
-      final apiKey = '37b530c875ea7fa6fc68a929423bcf0a'; // 실사용 시 보안 처리 요망
+      final apiKey = '37b530c875ea7fa6fc68a929423bcf0a';
       final url = Uri.parse(
         'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey&units=metric&lang=kr',
       );
 
       final response = await http.get(url);
       if (response.statusCode != 200) {
-        if (!mounted) return;
         setState(() => error = isKoreanMode
-            ? "API 오류: ${response.statusCode}"
-            : "API error: ${response.statusCode}");
+            ? "날씨 API 오류: ${response.statusCode}"
+            : "Weather API error: ${response.statusCode}");
         return;
       }
 
       final data = jsonDecode(response.body);
-      if (!mounted) return;
       setState(() {
         description = data['weather'][0]['description'];
         iconCode = data['weather'][0]['icon'];
@@ -93,7 +105,6 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
         isLoading = false;
       });
     } catch (e) {
-      if (!mounted) return;
       setState(() {
         error = isKoreanMode
             ? "날씨 정보를 불러오지 못했습니다."
