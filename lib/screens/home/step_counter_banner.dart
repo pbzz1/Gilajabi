@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
-import 'package:permission_handler/permission_handler.dart'; // ✅ 추가
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:gilajabi/providers/app_settings_provider.dart';
 
@@ -22,15 +22,7 @@ class _StepCounterBannerState extends State<StepCounterBanner> {
   @override
   void initState() {
     super.initState();
-    _requestPermissionAndStart(); // ✅ 퍼미션 요청 후 리스닝 시작
-  }
-
-  Future<void> _requestPermissionAndStart() async {
-    var status = await Permission.activityRecognition.status;
-    if (!status.isGranted) {
-      await Permission.activityRecognition.request();
-    }
-    _startListening(); // ✅ 퍼미션 확인 후 스트림 시작
+    _startListening();
   }
 
   Future<void> _syncTodaySteps() async {

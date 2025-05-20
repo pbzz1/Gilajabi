@@ -29,7 +29,10 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
       vsync: this,
       duration: const Duration(seconds: 1),
     );
-    _loadWeather();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadWeather();
+    });
   }
 
   @override
@@ -48,31 +51,14 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
     });
 
     try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        setState(() => error = isKoreanMode
-            ? "위치 서비스가 꺼져 있습니다. 설정에서 활성화해 주세요."
-            : "Location services are disabled.");
-        return;
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-
-      if (permission == LocationPermission.denied) {
-        setState(() => error = isKoreanMode
-            ? "위치 권한이 거부되었습니다."
-            : "Location permission was denied.");
-        return;
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        setState(() => error = isKoreanMode
-            ? "위치 권한이 영구적으로 거부되었습니다.\n설정에서 수동으로 허용해 주세요."
-            : "Location permission permanently denied.\nPlease enable it in settings.");
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        setState(() {
+          error = isKoreanMode
+              ? "위치 권한이 없어 날씨를 불러올 수 없습니다."
+              : "Location permission not granted.";
+          isLoading = false;
+        });
         return;
       }
 
@@ -92,8 +78,8 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
       final response = await http.get(url);
       if (response.statusCode != 200) {
         setState(() => error = isKoreanMode
-            ? "날씨 API 오류: ${response.statusCode}"
-            : "Weather API error: ${response.statusCode}");
+            ? "API 오류: ${response.statusCode}"
+            : "API error: ${response.statusCode}");
         return;
       }
 
@@ -183,7 +169,7 @@ class _WeatherBannerState extends State<WeatherBanner> with SingleTickerProvider
                   icon: const Icon(Icons.refresh),
                   onPressed: () {
                     _rotationController.forward(from: 0);
-                    _loadWeather();
+                    _loadWeather(); // 🔁 새로고침에도 위치 요청
                   },
                 ),
               ),
