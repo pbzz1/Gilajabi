@@ -2,6 +2,7 @@
 
 [![시연 영상]]([https://www.youtube.com/watch?v=gxJPX3VBRrU](https://youtube.com/shorts/gxJPX3VBRrU))
 
+https://youtube.com/shorts/gxJPX3VBRrU?feature=share
 한양도성길을 따라 걷는 도보 여행자들을 위한 종합 안내 앱입니다.  
 코스 정보, 실시간 위치 기반 스탬프, 커뮤니티 기능까지 한 번에 제공하는 **플러터 기반 모바일 애플리케이션**입니다.
 
