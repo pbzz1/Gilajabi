@@ -1,16 +1,46 @@
-# gilajabi
+# 길라잡이 (Gilajabi)
 
-2025-1 Mobile Capstone Design
+[![시연 영상]]([https://www.youtube.com/watch?v=영상ID](https://youtube.com/shorts/gxJPX3VBRrU))
 
-## Getting Started
+한양도성길을 따라 걷는 도보 여행자들을 위한 종합 안내 앱입니다.  
+코스 정보, 실시간 위치 기반 스탬프, 커뮤니티 기능까지 한 번에 제공하는 **플러터 기반 모바일 애플리케이션**입니다.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 📱 주요 기능
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### ✅ 1. 코스 안내 및 지도 연동
+- 한양도성길 6개 구간(백악, 낙산, 흥인지문, 남산, 숭례문, 인왕산) 상세 정보 제공
+- Kakao Map과 연동된 **웹 기반 코스 지도** 탑재
+- 터치 시 구간 별 설명 페이지로 이동
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### ✅ 2. 실시간 위치 기반 스탬프 시스템 (예정)
+- 사용자의 GPS 기반 위치를 추적
+- 특정 지점 도착 시 자동으로 스탬프 획득
+- 향후 도보 미션/리워드 연동 계획
+
+### ✅ 3. 게시판 기능
+- 사용자 간 정보 공유 및 후기 작성 가능
+- Firebase Firestore에 저장
+- Kakao 로그인 연동으로 사용자 인증
+
+### ✅ 4. 카카오 로그인
+- 카카오 SDK를 통해 간편 로그인 제공
+- 사용자 닉네임, 프로필 연동
+
+---
+
+## 🛠️ 사용 기술
+
+| 분류     | 기술                                                         |
+|----------|--------------------------------------------------------------|
+| 프론트엔드 | Flutter 3.x                                                  |
+| 상태 관리 | Provider                                                     |
+| 지도      | Kakao Maps API + WebView                                     |
+| 백엔드    | Firebase (Authentication, Firestore, Storage)               |
+| 인증      | Kakao Flutter SDK                                           |
+
+---
+
+## 🖥️ 프로젝트 구조
+
