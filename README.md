@@ -1,6 +1,6 @@
 # 길라잡이 (Gilajabi)
 
-[![시연 영상]]([https://www.youtube.com/watch?v=영상ID](https://youtube.com/shorts/gxJPX3VBRrU))
+[![시연 영상]]([https://www.youtube.com/watch?v=gxJPX3VBRrU](https://youtube.com/shorts/gxJPX3VBRrU))
 
 한양도성길을 따라 걷는 도보 여행자들을 위한 종합 안내 앱입니다.  
 코스 정보, 실시간 위치 기반 스탬프, 커뮤니티 기능까지 한 번에 제공하는 **플러터 기반 모바일 애플리케이션**입니다.
@@ -43,4 +43,10 @@
 ---
 
 ## 🖥️ 프로젝트 구조
-
+lib/
+├── course/ # 각 구간별 코스 정보 페이지
+├── screens/ # 홈, 게시판, 프로필 등 주요 탭
+├── login.dart # 카카오톡 로그인 구현
+├── myhomepage.dart # 메인 탭 관리
+├── app.dart # 로그인 상태 기반 화면 전환
+├── main.dart # 앱 시작점 및 Kakao 초기화
