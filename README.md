@@ -2,7 +2,8 @@
 
 한양도성을 따라 걷는 코스 가이드 앱
 
-![Image](https://github.com/user-attachments/assets/f2b9db9e-1a74-4085-a1de-f0acd2ed9d24)
+![Image](https://github.com/user-attachments/assets/7090d4bb-ad02-4921-a606-f3216fe59ddf)
+![Image](https://github.com/user-attachments/assets/dc740080-49da-4c9e-a72c-649084941244)
 
 ---
 
@@ -20,7 +21,7 @@
 
 ## 📂 프로젝트 구조
 
-![Image](https://github.com/user-attachments/assets/1f932dc7-3e86-4226-9f28-eb58bb08d956)
+![Image](https://github.com/user-attachments/assets/925fdf95-69fc-4898-8d12-bcfaac83e98c)
 
 ---
 
@@ -44,15 +45,19 @@
 
 ## 📱 주요 기능
 
-![Image](https://github.com/user-attachments/assets/ba39dd2e-acc0-40c5-81f2-70168634f035) ![Image](https://github.com/user-attachments/assets/e9c99a80-b07d-46d8-b6db-5b0c103e7727)
+![Image](https://github.com/user-attachments/assets/61d7a346-0510-4c33-82dc-b08c1debdc39) ![Image](https://github.com/user-attachments/assets/e6f0ad8a-513a-4e15-b3bd-a9ecc533f988)
 
 ### 0. 카카오로 로그인
 - 별도의 회원가입 없이 카카오 계정으로 로그인 가능
 - 사용자 닉네임, 프로필 연동
 
+![Image](https://github.com/user-attachments/assets/156fe1b7-ad4f-4300-b446-dea9c7aba951)
+
 ### 1. 코스별 도보 안내
 - 백악, 낙산, 흥인지문, 남산, 숭례문, 인왕산 6개 구간의 상세 경로 제공
 - 터치 시 구간 별 설명 페이지로 이동
+
+![Image](https://github.com/user-attachments/assets/9353c0c1-8f19-4b9a-be49-ab3e5e53592f) ![Image](https://github.com/user-attachments/assets/c1fb640b-4d9e-4396-b427-65d0a4af38ba)
 
 ### 2. 스탬프 투어
 - 실시간 위치 추적 및 스탬프 위치 도착 안내 기능
@@ -60,29 +65,45 @@
 - 스탬프 완료 여부에 따라 맵 마커 변경
 - 스탬프 기록은 Firebase에 저장되어 언제든 재확인 가능
 
+![Image](https://github.com/user-attachments/assets/125cae3d-385f-4ed9-896a-b0423b74f7d2) ![Image](https://github.com/user-attachments/assets/d7207f1a-5d15-425a-aecf-61e1467eac9e)
+
 ### 3. 게시판
 - 글 작성, 수정, 삭제, 댓글 작성 가능
 - 이미지 업로드
 - 좋아요 기능 + 검색 기능 지원
 - 사용자 간 정보 공유 및 후기 작성 가능
 
+![Image](https://github.com/user-attachments/assets/cdf72aa9-973b-44cf-ab51-8d277632626f)
+
 ### 4. 날씨 정보
 - 실시간 기온 및 날씨 표시
 - 위치 권한 승인 후 자동 위치 기반 날씨 로드
 
+![Image](https://github.com/user-attachments/assets/cdf72aa9-973b-44cf-ab51-8d277632626f) ![Image](https://github.com/user-attachments/assets/f66c32b5-6523-4e23-8535-9cfa9146ae0f)
+
 ### 5. 만보기
 - 사용자 걸음 수 측정 기능
 
+![Image](https://github.com/user-attachments/assets/fda5199c-21cd-4a3e-827c-ca1dad107801)
+
 ### 6. 메모장
 - 간단한 메모 작성 기능
+
+![Image](https://github.com/user-attachments/assets/0e27dc9d-ae47-47ea-9cc6-af14c0b8f337) ![Image](https://github.com/user-attachments/assets/1987193b-f303-45aa-992c-5a18182eb17c) ![Image](https://github.com/user-attachments/assets/998f6351-694b-48cc-9b0c-bcdd8044f343)
 
 ### 7. 마이페이지
 - 내 닉네임 변경
 - 내가 쓴 글 / 좋아요한 글 / 내 스탬프 보기
 - 로그아웃 기능
 
+![Image](https://github.com/user-attachments/assets/4429ee92-cf81-4919-a614-208ed0b8408c)
+
+### 8. 설정
+- 라이트 모드 / 다크 모드 전환 가능
+- 한글 모드 / 영어 모드 전환 가능
+  
 ---
 
 ## 🖼️ 소개 판넬
 
-![Image](https://github.com/user-attachments/assets/43c7e4fc-604c-41bc-9611-0a752f45600d)
+![Image](https://github.com/user-attachments/assets/7ec8379a-708d-452f-b92b-9c835d806c02)
