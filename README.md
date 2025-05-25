@@ -52,7 +52,7 @@ Kakao Maps API을 활용한 한양 도성길 산책 콘텐츠 어플
 
 ---
 
-## 📽️ 시연 영상 <a id="시연-영상"></a>
+## 📽️ 시연 영상 <a id="-시연-영상"></a>
 
 [![시연 영상 썸네일](https://img.youtube.com/vi/gxJPX3VBRrU/0.jpg)](https://youtu.be/gxJPX3VBRrU?si=cpbIlLwUzAHBUuQI)
 
@@ -119,6 +119,6 @@ Kakao Maps API을 활용한 한양 도성길 산책 콘텐츠 어플
   
 ---
 
-## 🖼️ 소개 판넬 <a id="소개-판넬"></a>
+## 🖼️ 소개 판넬 <a id="-소개-판넬"></a>
 
 ![Image](https://github.com/user-attachments/assets/7ec8379a-708d-452f-b92b-9c835d806c02)
