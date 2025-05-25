@@ -1,6 +1,6 @@
 # 길라잡이 (Gilajabi)
 
-Kakao maps API을 활용한 한양 도성길 산책 콘텐츠 어플
+Kakao Maps API을 활용한 한양 도성길 산책 콘텐츠 어플
 
 ![Image](https://github.com/user-attachments/assets/7090d4bb-ad02-4921-a606-f3216fe59ddf)
 ![Image](https://github.com/user-attachments/assets/dc740080-49da-4c9e-a72c-649084941244)
@@ -41,6 +41,14 @@ Kakao maps API을 활용한 한양 도성길 산책 콘텐츠 어플
 ## 📂 프로젝트 구조
 
 ![Image](https://github.com/user-attachments/assets/925fdf95-69fc-4898-8d12-bcfaac83e98c)
+
+| 분야 | 기술 |
+|------|------|
+| 프레임워크 | Flutter |
+| 개발 언어 | Dart |
+| 로그인 | Kakao SDK (카카오계정 로그인) |
+| 지도 | Kakao Maps API |
+| 백엔드 | Firebase Firestore, Firebase Storage |
 
 ---
 
