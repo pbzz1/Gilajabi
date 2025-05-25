@@ -19,21 +19,9 @@
 
 ---
 
-## 📂 프로젝트 구조
+## 📂🎎🎎 프로젝트 구조
 
 ![Image](https://github.com/user-attachments/assets/925fdf95-69fc-4898-8d12-bcfaac83e98c)
-
----
-
-## 🛠 기술 스택
-
-| 분야 | 기술 |
-|------|------|
-| 프레임워크 | Flutter |
-| 개발 언어 | Dart |
-| 로그인 | Kakao SDK (카카오계정 로그인) |
-| 지도 | Kakao Maps API |
-| 백엔드 | Firebase Firestore, Firebase Storage |
 
 ---
 
