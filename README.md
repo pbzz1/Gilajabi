@@ -46,7 +46,7 @@ Kakao Maps API을 활용한 한양 도성길 산책 콘텐츠 어플
 |------|------|
 | 프레임워크 | Flutter |
 | 개발 언어 | Dart |
-| 로그인 | Kakao SDK (카카오계정 로그인) |
+| 로그인 | Kakao SDK |
 | 지도 | Kakao Maps API |
 | 백엔드 | Firebase Firestore, Firebase Storage |
 
