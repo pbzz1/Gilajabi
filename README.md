@@ -104,7 +104,7 @@ Kakao Maps API을 활용한 한양 도성길 산책 콘텐츠 어플
   
 ![Image](https://github.com/user-attachments/assets/fda5199c-21cd-4a3e-827c-ca1dad107801)
 
-### 7. 마이페이지
+### 7. 프로필
 - 내 닉네임 변경
 - 내가 쓴 글 / 좋아요한 글 / 내 스탬프 보기
 - 로그아웃 기능
