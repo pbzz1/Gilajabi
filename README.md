@@ -78,7 +78,7 @@ Kakao Maps API을 활용한 한양 도성길 산책 콘텐츠 어플
 - 스탬프 완료 여부에 따라 맵 마커 변경
 - 스탬프 기록은 Firebase에 저장되어 언제든 재확인 가능
   
-![Image](https://github.com/user-attachments/assets/762e9125-8166-48f3-ba51-d195f02eb782) ![Image](https://github.com/user-attachments/assets/3937afe6-6f5c-411e-8352-c377a222cb05)
+![Image](https://github.com/user-attachments/assets/afead89f-c347-409c-8f6a-1bdedbd2419c) ![Image](https://github.com/user-attachments/assets/3937afe6-6f5c-411e-8352-c377a222cb05)
 
 ### 4. 게시판
 - 글 작성, 수정, 삭제, 댓글 작성 기능
