@@ -70,7 +70,7 @@ Kakao Maps API을 활용한 한양 도성길 산책 콘텐츠 어플
 - 백악, 낙산, 흥인지문, 남산, 숭례문, 인왕산 6개 구간의 상세 경로 제공
 - 터치 시 구간 별 설명 페이지로 이동
   
-![Image](https://github.com/user-attachments/assets/156fe1b7-ad4f-4300-b446-dea9c7aba951)
+![Image](https://github.com/user-attachments/assets/156fe1b7-ad4f-4300-b446-dea9c7aba951) ![Image](https://github.com/user-attachments/assets/f2eceb74-2159-4c63-90d5-2f1cc4503e5e)
 
 ### 3. 스탬프 투어
 - 실시간 위치 추적 및 스탬프 위치 도착 안내 기능
