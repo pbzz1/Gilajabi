@@ -64,7 +64,7 @@ Kakao Maps API을 활용한 한양 도성길 산책 콘텐츠 어플
 - 별도의 회원가입 없이 카카오 계정으로 로그인 가능
 - 사용자 닉네임, 프로필 연동
   
-![Image](https://github.com/user-attachments/assets/f3390b09-bc3d-42ba-8580-cd1490dd30d1) ![Image](https://github.com/user-attachments/assets/61e9e613-e745-4b00-9923-285a2bdddd95)
+![Image](https://github.com/user-attachments/assets/836e06be-4404-4190-96d2-12e6391f3074) ![Image](https://github.com/user-attachments/assets/61e9e613-e745-4b00-9923-285a2bdddd95)
 
 ### 2. 코스별 안내
 - 백악, 낙산, 흥인지문, 남산, 숭례문, 인왕산 6개 구간의 상세 경로 제공
