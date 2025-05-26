@@ -86,36 +86,36 @@ Kakao Maps API을 활용한 한양 도성길 산책 콘텐츠 어플
 - 좋아요 기능 + 검색 기능 지원
 - 사용자 간 정보 공유 및 후기 작성 가능
 
-![Image](https://github.com/user-attachments/assets/125cae3d-385f-4ed9-896a-b0423b74f7d2) ![Image](https://github.com/user-attachments/assets/d7207f1a-5d15-425a-aecf-61e1467eac9e)
+![Image](https://github.com/user-attachments/assets/a609f2c9-8697-43f5-9b22-c4d389271546) ![Image](https://github.com/user-attachments/assets/f54eab67-0398-4e43-bab1-dfa57a1431b5)
 
 ### 5. 날씨 정보
 - 실시간 기온 및 날씨 표시
 - 위치 권한 승인 후 자동 위치 기반 날씨 로드
   
-![Image](https://github.com/user-attachments/assets/53fb3310-304c-4ecc-afbd-316dc757b723)
+![Image](https://github.com/user-attachments/assets/900b27b8-1dff-44d6-be24-26628342ab9e)
 
 ### 6. 만보기
 - 사용자 걸음 수 측정 기능
   
-![Image](https://github.com/user-attachments/assets/53fb3310-304c-4ecc-afbd-316dc757b723) ![Image](https://github.com/user-attachments/assets/1dd8db57-78d6-4b0a-bf8b-d0eae99da3f3)
+![Image](https://github.com/user-attachments/assets/900b27b8-1dff-44d6-be24-26628342ab9e) ![Image](https://github.com/user-attachments/assets/49d18cef-67e7-49ae-9dec-af69a330d608)
 
 ### 7. 메모장
 - 간단한 메모 작성 기능
   
-![Image](https://github.com/user-attachments/assets/fda5199c-21cd-4a3e-827c-ca1dad107801)
+![Image](https://github.com/user-attachments/assets/38669176-4a56-45a2-bcba-0e1d2534e458)
 
 ### 8. 프로필
 - 내 닉네임 변경
 - 내가 쓴 글 / 좋아요한 글 / 내 스탬프 보기
 - 로그아웃 기능
   
-![Image](https://github.com/user-attachments/assets/0e27dc9d-ae47-47ea-9cc6-af14c0b8f337) ![Image](https://github.com/user-attachments/assets/1987193b-f303-45aa-992c-5a18182eb17c) ![Image](https://github.com/user-attachments/assets/998f6351-694b-48cc-9b0c-bcdd8044f343)
+![Image](https://github.com/user-attachments/assets/e0abcbe7-9481-45e2-bbea-f63424dcd374) ![Image](https://github.com/user-attachments/assets/a599ac7e-fcb5-4897-ab5d-723413ba8d4d) ![Image](https://github.com/user-attachments/assets/4d43605a-6186-423a-833d-0af72630a727)
 
 ### 9. 설정
 - 라이트 모드 / 다크 모드 전환 기능
 - 한글 모드 / 영어 모드 전환 기능
   
-![Image](https://github.com/user-attachments/assets/4429ee92-cf81-4919-a614-208ed0b8408c)
+![Image](https://github.com/user-attachments/assets/3a43a036-cd55-404c-8766-a3fa1e345656)
   
 ---
 
