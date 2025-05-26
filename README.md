@@ -70,7 +70,7 @@ Kakao Maps API을 활용한 한양 도성길 산책 콘텐츠 어플
 - 백악, 낙산, 흥인지문, 남산, 숭례문, 인왕산 6개 구간의 상세 경로 제공
 - 터치 시 구간 별 설명 페이지로 이동
   
-![Image](https://github.com/user-attachments/assets/156fe1b7-ad4f-4300-b446-dea9c7aba951) ![Image](https://github.com/user-attachments/assets/f2eceb74-2159-4c63-90d5-2f1cc4503e5e)
+![Image](https://github.com/user-attachments/assets/ee0bcb16-50d5-4e9e-91a0-dc4c3b4422fa)
 
 ### 3. 스탬프 투어
 - 실시간 위치 추적 및 스탬프 위치 도착 안내 기능
@@ -78,7 +78,7 @@ Kakao Maps API을 활용한 한양 도성길 산책 콘텐츠 어플
 - 스탬프 완료 여부에 따라 맵 마커 변경
 - 스탬프 기록은 Firebase에 저장되어 언제든 재확인 가능
   
-![Image](https://github.com/user-attachments/assets/9353c0c1-8f19-4b9a-be49-ab3e5e53592f) ![Image](https://github.com/user-attachments/assets/c1fb640b-4d9e-4396-b427-65d0a4af38ba)
+![Image](https://github.com/user-attachments/assets/762e9125-8166-48f3-ba51-d195f02eb782) ![Image](https://github.com/user-attachments/assets/3937afe6-6f5c-411e-8352-c377a222cb05)
 
 ### 4. 게시판
 - 글 작성, 수정, 삭제, 댓글 작성 기능
